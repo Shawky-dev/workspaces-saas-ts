@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { NestFactory } from '@nestjs/core'
 import { createAppModule } from './app.module'
-import { ProductSeederService } from './product-seeder.service'
+import { ProductSeederService } from './modules/products/product-seeder.service'
 
 async function main(): Promise<void> {
   const AppModule = createAppModule({

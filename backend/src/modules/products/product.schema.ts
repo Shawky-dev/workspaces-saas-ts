@@ -4,7 +4,7 @@ import { Document } from 'mongoose'
 @Schema()
 export class Product {
     @Prop()
-    value: string
+    value?: string
 }
 
 export type ProductDocument = Product & Document
