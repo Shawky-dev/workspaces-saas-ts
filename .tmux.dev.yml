@@ -6,7 +6,7 @@ windows:
     layout: even-vertical
     panes:
       - shell_command:
-          - docker compose -f docker-compose.dev.yml up
+          - docker compose up
 
   - window_name: backend
     layout: main-horizontal
