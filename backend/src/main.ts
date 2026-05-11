@@ -1,21 +1,17 @@
 import 'reflect-metadata'
 import { NestFactory } from '@nestjs/core'
-import { createAppModule } from './app.module'
-import { ProductSeederService } from './modules/products/product-seeder.service'
 
-async function main(): Promise<void> {
-  const AppModule = createAppModule({
-    commonUri: process.env.MONGO_COMMON_URI!,
-    orgOneUri: process.env.MONGO_ORG1_URI!,
-  })
+import { AppModule } from './app.module'
+import { setupValidation } from './common/config/validation.config'
 
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule)
 
-  await app.get(ProductSeederService).seed()
+  setupValidation(app)
 
   await app.listen(3000)
 
   console.log('Server running at http://localhost:3000')
 }
 
-void main().catch(console.error)
+void bootstrap()
