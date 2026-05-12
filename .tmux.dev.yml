@@ -39,4 +39,4 @@ windows:
 
       # Mongo shell
       - shell_command:
-          - bash -lc 'set -o allexport && [ -f .env ] && source .env && set +o allexport && docker exec -it mongodb mongosh -u "$MONGO_USERNAME" -p "$MONGO_PASSWORD"'
+          - docker exec -it mongodb mongosh

@@ -4,6 +4,14 @@ import {
     fromHeader,
 } from '@phen0menon/nestjs-mongoose-tenancy'
 
+const getTenants = async ({ commonConnection }) => {
+    const docs = await commonConnection
+        .collection('tenants')
+        .find({})
+        .toArray()
+    return docs.map(t => ({ id: t.slug, uri: t.mongoUri }))
+}
+
 @Module({
     imports: [
         MongooseTenancyModule.forRoot({
@@ -11,12 +19,7 @@ import {
                 uri: process.env.MONGO_COMMON_URI!,
             },
 
-            tenants: [
-                {
-                    id: 'org-1',
-                    uri: process.env.MONGO_ORG1_URI!,
-                },
-            ],
+            tenants: getTenants,
 
             tenantResolver: fromHeader('x-tenant-id'),
         }),
@@ -24,4 +27,6 @@ import {
 
     exports: [MongooseTenancyModule],
 })
+
+
 export class TenancyModule { }

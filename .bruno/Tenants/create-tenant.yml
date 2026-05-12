@@ -10,10 +10,8 @@ http:
     type: json
     data: |-
       {
-        "tenantId": "tenant_1",
-        "slug": "tenant-2",
-        "name": "Tenant two",
-        "mongoUri": "mongodb://localhost:27017/tenant2"
+        "slug": "tenant-1",
+        "name": "Tenant one"
       }
   auth: inherit
 

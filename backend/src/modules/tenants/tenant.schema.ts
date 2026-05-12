@@ -3,7 +3,6 @@ import { Document } from 'mongoose'
 
 @Schema({ timestamps: true })
 export class Tenant {
-
     @Prop({ required: true, unique: true })
     slug!: string
 
