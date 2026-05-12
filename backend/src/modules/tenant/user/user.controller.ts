@@ -7,12 +7,17 @@ export class UserController {
     constructor(private readonly users: UserService) { }
 
     @Post()
-    async create(@Body() dto: CreateUserDto) {
-        return this.users.createUser(dto)
+    async create(
+        @Param('tenantId') tenantId: string,
+        @Body() dto: CreateUserDto,
+    ) {
+        return this.users.createUser(tenantId, dto)
     }
 
     @Get()
-    async findAll() {
-        return this.users.findAllUsers()
+    async findAll(
+        @Param('tenantId') tenantId: string,
+    ) {
+        return this.users.findAllUsers(tenantId)
     }
 }

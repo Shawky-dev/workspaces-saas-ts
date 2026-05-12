@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common'
-
 import { InjectModel } from '@nestjs/mongoose'
-
 import { Model } from 'mongoose'
 
 import {
@@ -9,17 +7,17 @@ import {
     UserDocument,
 } from './user.schema'
 
-import { BaseRepository } from 'src/public/db/base.repository'
+import { CommonRepository } from 'src/public/db/common.repository'
 
 @Injectable()
 export class UserService
-    extends BaseRepository<UserDocument> {
+    extends CommonRepository<UserDocument> {
 
     constructor(
         @InjectModel(USER_MODEL_NAME)
-        private readonly users: Model<UserDocument>,
+        model: Model<UserDocument>,
     ) {
-        super(users)
+        super(model)
     }
 
     async createUser(data: Partial<UserDocument>) {
@@ -28,5 +26,9 @@ export class UserService
 
     async findAllUsers() {
         return this.findAll()
+    }
+
+    async findByEmail(email: string) {
+        return this.findOne({ email })
     }
 }

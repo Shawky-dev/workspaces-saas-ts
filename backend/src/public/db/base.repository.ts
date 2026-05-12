@@ -1,44 +1,28 @@
-import { NotFoundException } from '@nestjs/common'
-import { Model, QueryFilter } from 'mongoose'
-
-import { MongoExceptionMapper } from './mongo-exception.mapper'
+import { NotFoundException } from "@nestjs/common"
+import { Model, QueryFilter } from "mongoose"
 
 export abstract class BaseRepository<T> {
-    constructor(protected readonly model: Model<T>) { }
+    protected abstract modelFor(tenantId?: string): Model<T>
 
-    protected async createDocument(data: Partial<T>) {
-        try {
-            return await this.model.create(data)
-        } catch (error) {
-            MongoExceptionMapper.map(error)
-        }
+    protected async createDocument(data: Partial<T>, tenantId?: string) {
+        return this.modelFor(tenantId).create(data)
     }
 
-    protected async findAll() {
-        return this.model.find().lean()
+    protected async findAll(tenantId?: string) {
+        return this.modelFor(tenantId).find().lean()
     }
 
-    protected async findById(id: string) {
-        const document = await this.model.findById(id).lean()
-
-        if (!document) {
-            throw new NotFoundException(
-                `${this.model.modelName} not found`,
-            )
-        }
-
-        return document
+    protected async findById(id: string, tenantId?: string) {
+        const model = this.modelFor(tenantId)
+        const doc = await model.findById(id).lean()
+        if (!doc) throw new NotFoundException(`${model.modelName} not found`)
+        return doc
     }
 
-    protected async findOne(filter: QueryFilter<T>) {
-        const document = await this.model.findOne(filter).lean()
-
-        if (!document) {
-            throw new NotFoundException(
-                `${this.model.modelName} not found`,
-            )
-        }
-
-        return document
+    protected async findOne(filter: QueryFilter<T>, tenantId?: string) {
+        const model = this.modelFor(tenantId)
+        const doc = await model.findOne(filter).lean()
+        if (!doc) throw new NotFoundException(`${model.modelName} not found`)
+        return doc
     }
 }

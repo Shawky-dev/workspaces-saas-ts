@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common'
-
 import { MongooseModule } from '@nestjs/mongoose'
 
 import { TenantController } from './tenant.controller'
@@ -9,6 +8,8 @@ import {
     TENANT_MODEL_NAME,
     TenantSchema,
 } from './tenant.schema'
+import { TenantBootstrapModule } from './bootstrap/bootstrap.module'
+
 
 @Module({
     imports: [
@@ -18,6 +19,8 @@ import {
                 schema: TenantSchema,
             },
         ]),
+
+        TenantBootstrapModule,
     ],
 
     controllers: [TenantController],

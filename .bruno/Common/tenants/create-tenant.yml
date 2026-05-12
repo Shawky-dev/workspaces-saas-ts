@@ -11,7 +11,10 @@ http:
     data: |-
       {
         "slug": "tenant-1",
-        "name": "Tenant one"
+        "name": "Tenant one",
+        "adminName":"admin",
+        "adminEmail":"1@1.com",
+        "adminPassword":"123"
       }
   auth: inherit
 

@@ -4,9 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose'
 
 import { TenancyModule } from './public/config/tenancy.module'
 
-import { TenantsModule } from './modules/tenant/tenants/tenant.module'
+import { TenantsModule } from './modules/common/tenants/tenant.module'
 import { TenantUserModule } from './modules/tenant/user/user.module'
 import { CommonUserModule } from './modules/common/user/user.module'
+import { TenantBootstrapModule } from './modules/common/tenants/bootstrap/bootstrap.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CommonUserModule } from './modules/common/user/user.module'
     //_COMMON
     TenantsModule,
     CommonUserModule,
+    TenantBootstrapModule,
     //_TENANT
     TenantUserModule,
   ],

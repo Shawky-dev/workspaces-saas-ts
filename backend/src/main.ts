@@ -3,10 +3,11 @@ import { NestFactory } from '@nestjs/core'
 
 import { AppModule } from './app.module'
 import { setupValidation } from './public/config/validation.config'
+import { MongoExceptionFilter } from './public/db/mongo-exception.filter'
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule)
-
+  app.useGlobalFilters(new MongoExceptionFilter())
   setupValidation(app)
 
   await app.listen(3000)
