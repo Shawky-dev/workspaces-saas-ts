@@ -10,11 +10,10 @@ import {
 import { UserService } from './user.service'
 
 import { UserController } from './user.controller'
-import { MongooseTenancyModule } from '@phen0menon/nestjs-mongoose-tenancy'
 
 @Module({
     imports: [
-        MongooseTenancyModule.forFeature([
+        MongooseModule.forFeature([
             {
                 name: USER_MODEL_NAME,
                 schema: UserSchema,
@@ -28,4 +27,4 @@ import { MongooseTenancyModule } from '@phen0menon/nestjs-mongoose-tenancy'
 
     exports: [UserService],
 })
-export class TenantUserModule { }
+export class CommonUserModule { }

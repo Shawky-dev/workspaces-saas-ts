@@ -5,7 +5,7 @@ import { Model } from 'mongoose'
 
 import { TENANT_MODEL_NAME, TenantDocument } from './tenant.schema'
 import { CreateTenantDto } from './dto/create-tenant'
-import { BaseRepository } from 'src/common/db/base.repository'
+import { BaseRepository } from 'src/public/db/base.repository'
 
 @Injectable()
 export class TenantService extends BaseRepository<TenantDocument> {

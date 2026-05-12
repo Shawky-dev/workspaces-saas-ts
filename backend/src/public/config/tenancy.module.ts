@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import {
     MongooseTenancyModule,
     fromHeader,
+    fromRequest,
 } from '@phen0menon/nestjs-mongoose-tenancy'
 
 const getTenants = async ({ commonConnection }) => {
@@ -9,6 +10,7 @@ const getTenants = async ({ commonConnection }) => {
         .collection('tenants')
         .find({})
         .toArray()
+    console.log(docs)
     return docs.map(t => ({ id: t.slug, uri: t.mongoUri }))
 }
 
@@ -16,12 +18,12 @@ const getTenants = async ({ commonConnection }) => {
     imports: [
         MongooseTenancyModule.forRoot({
             common: {
-                uri: process.env.MONGO_MASTER_URI!,
+                uri: process.env.MONGO_COMMON_URI!,
             },
 
             tenants: getTenants,
 
-            tenantResolver: fromHeader('x-tenant-id'),
+            tenantResolver: fromRequest((req: any) => req.params.tenantId),
         }),
     ],
 

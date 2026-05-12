@@ -2,7 +2,7 @@ import 'reflect-metadata'
 import { NestFactory } from '@nestjs/core'
 
 import { AppModule } from './app.module'
-import { setupValidation } from './common/config/validation.config'
+import { setupValidation } from './public/config/validation.config'
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule)

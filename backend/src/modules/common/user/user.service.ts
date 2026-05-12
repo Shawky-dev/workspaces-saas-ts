@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common'
 
+import { InjectModel } from '@nestjs/mongoose'
+
 import { Model } from 'mongoose'
 
 import {
@@ -8,14 +10,13 @@ import {
 } from './user.schema'
 
 import { BaseRepository } from 'src/public/db/base.repository'
-import { InjectTenantModel } from '@phen0menon/nestjs-mongoose-tenancy'
 
 @Injectable()
 export class UserService
     extends BaseRepository<UserDocument> {
 
     constructor(
-        @InjectTenantModel(USER_MODEL_NAME)
+        @InjectModel(USER_MODEL_NAME)
         private readonly users: Model<UserDocument>,
     ) {
         super(users)
