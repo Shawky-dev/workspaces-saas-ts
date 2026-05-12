@@ -1,0 +1,25 @@
+info:
+  name: create-tenant
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{URL}}/tenants"
+  body:
+    type: json
+    data: |-
+      {
+        "slug": "tenant-1",
+        "name": "Tenant one",
+        "adminName":"admin",
+        "adminEmail":"1@1.com",
+        "adminPassword":"123"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
