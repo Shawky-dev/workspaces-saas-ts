@@ -4,21 +4,17 @@ import { MongooseModule } from '@nestjs/mongoose'
 
 import { TenancyModule } from './common/config/tenancy.module'
 
-import { ProductsModule } from './modules/products/products.module'
-
-import { TenantsModule } from './modules/tenants/tenant.module'
+import { TenantsModule } from './modules/tenant/tenants/tenant.module'
 
 @Module({
   imports: [
-    // COMMON / SHARED DATABASE
+    // MASTER / SHARED DATABASE
     MongooseModule.forRoot(
-      process.env.MONGO_COMMON_URI!,
+      process.env.MONGO_MASTER_URI!,
     ),
 
     // TENANT DATABASE SYSTEM
     TenancyModule,
-
-    ProductsModule,
 
     TenantsModule,
   ],

@@ -16,7 +16,7 @@ const getTenants = async ({ commonConnection }) => {
     imports: [
         MongooseTenancyModule.forRoot({
             common: {
-                uri: process.env.MONGO_COMMON_URI!,
+                uri: process.env.MONGO_MASTER_URI!,
             },
 
             tenants: getTenants,
