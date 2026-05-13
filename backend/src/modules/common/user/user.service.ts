@@ -8,7 +8,12 @@ import {
 } from './user.schema'
 
 import { CommonRepository } from 'src/public/db/common.repository'
-
+/**
+ * Service for managing platform-level users in the **common database**.
+ *
+ * Extends {@link CommonRepository} so all operations target the shared
+ * `MONGO_COMMON_URI` database, not any tenant-specific database.
+ */
 @Injectable()
 export class UserService
     extends CommonRepository<UserDocument> {

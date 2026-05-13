@@ -5,6 +5,12 @@ import { TenantRepository } from 'src/public/db/tenant.repository'
 import { USER_MODEL_NAME, UserDocument } from './user.schema'
 import { CreateUserDto } from './dto/create-user'
 
+/**
+ * Service for managing users within a **specific tenant's database**.
+ *
+ * Extends {@link TenantRepository} — every method requires a `tenantId` to
+ * route the query to the correct workspace database via the `TenantModelRegistry`.
+ */
 @Injectable()
 export class UserService extends TenantRepository<UserDocument> {
     constructor(
@@ -21,6 +27,14 @@ export class UserService extends TenantRepository<UserDocument> {
     async findAllUsers(tenantId: string) {
         return this.findAll(tenantId)
     }
+
+    /**
+     * Finds a tenant user by email. Returns `null` if not found (does NOT throw).
+     * Used during bootstrapping to avoid duplicate admin creation.
+     * @param tenantId - The tenant identifier.
+     * @param email - The email to search for.
+     * @returns The lean `UserDocument` or `null`.
+     */
     async findByEmail(tenantId: string, email: string) {
         return this.modelFor(tenantId).findOne({ email }).lean() // no throwing
     }
