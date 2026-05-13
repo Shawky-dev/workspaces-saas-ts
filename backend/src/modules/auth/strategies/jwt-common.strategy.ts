@@ -4,6 +4,12 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
 import { ConfigService } from '@nestjs/config'
 import { UserService } from '../../common/user/user.service'
 
+/**
+ * Passport JWT strategy for authenticating platform-level users.
+ *
+ * This strategy only accepts tokens with `type: 'common'` and resolves the
+ * user from the shared common database using the `sub` claim.
+ */
 @Injectable()
 export class JwtCommonStrategy extends PassportStrategy(Strategy, 'jwt-common') {
     constructor(
@@ -23,6 +29,13 @@ export class JwtCommonStrategy extends PassportStrategy(Strategy, 'jwt-common') 
         })
     }
 
+    /**
+     * Validates the JWT payload against the common user collection.
+     *
+     * @param payload - Decoded JWT payload produced by `JwtService.sign`.
+     * @returns The sanitized user object attached to `request.user`.
+     * @throws {UnauthorizedException} When the token type is wrong or the user cannot be found.
+     */
     async validate(payload: any) {
         if (payload.type !== 'common') {
             throw new UnauthorizedException('Invalid token type')

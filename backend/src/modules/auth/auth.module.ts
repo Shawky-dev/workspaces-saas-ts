@@ -9,6 +9,12 @@ import { JwtTenantStrategy } from './strategies/jwt-tenant.strategy'
 import { CommonUserModule } from '../common/user/user.module'
 import { TenantUserModule } from '../tenant/user/user.module'
 
+/**
+ * Auth module that wires together JWT signing, Passport strategies, and user lookup services.
+ *
+ * Importing both user modules lets the auth service validate credentials against the
+ * shared common database and the tenant-scoped workspace databases.
+ */
 @Module({
     imports: [
         PassportModule,
