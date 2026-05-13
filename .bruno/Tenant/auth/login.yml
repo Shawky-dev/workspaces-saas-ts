@@ -1,0 +1,22 @@
+info:
+  name: login
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{URL}}/auth/{{tenantId}}/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email":"1@1.com",
+        "password":"123456"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

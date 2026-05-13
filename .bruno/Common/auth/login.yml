@@ -1,18 +1,15 @@
 info:
-  name: create-tenant
+  name: login
   type: http
-  seq: 2
+  seq: 1
 
 http:
   method: POST
-  url: "{{URL}}/tenants"
+  url: "{{URL}}/auth/common/login"
   body:
     type: json
     data: |-
       {
-        "slug": "tenant-1",
-        "name": "Tenant one",
-        "adminName":"admin",
         "adminEmail":"1@1.com",
         "adminPassword":"123456"
       }

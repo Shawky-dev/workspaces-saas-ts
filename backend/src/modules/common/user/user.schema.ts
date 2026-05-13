@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
+import * as bcrypt from 'bcrypt'
 /**
  * Mongoose schema for a **platform-level user** stored in the common database.
  *
@@ -23,15 +24,21 @@ export class User {
     @Prop({ required: true })
     name!: string
 
-    @Prop({
-        default: 'admin',
-    })
-    role!: string
 }
 
 export type UserDocument = User & Document
 
 export const UserSchema =
     SchemaFactory.createForClass(User)
+
+UserSchema.pre('save', async function () {
+    // only hash if password changed
+    if (!this.isModified('password')) {
+        return
+    }
+
+    const salt = await bcrypt.genSalt(10)
+    this.password = await bcrypt.hash(this.password, salt)
+})
 
 export const USER_MODEL_NAME = User.name

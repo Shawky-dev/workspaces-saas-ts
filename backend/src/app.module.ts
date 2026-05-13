@@ -8,16 +8,21 @@ import { TenantsModule } from './modules/common/tenants/tenant.module'
 import { TenantUserModule } from './modules/tenant/user/user.module'
 import { CommonUserModule } from './modules/common/user/user.module'
 import { TenantBootstrapModule } from './modules/common/tenants/bootstrap/bootstrap.module'
+import { ConfigModule } from '@nestjs/config'
+import { AuthModule } from './modules/auth/auth.module'
 
 @Module({
   imports: [
     //_CONFIG
-    // COMMON / SHARED DATABASE
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    TenancyModule,
+    //
     MongooseModule.forRoot(
       process.env.MONGO_COMMON_URI!,
     ),
-    // TENANT DATABASE SYSTEM
-    TenancyModule,
+    AuthModule,
     //_COMMON
     TenantsModule,
     CommonUserModule,
