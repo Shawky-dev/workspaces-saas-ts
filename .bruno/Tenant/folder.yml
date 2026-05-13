@@ -7,4 +7,4 @@ request:
   auth: inherit
   variables:
     - name: tenantId
-      value: tenant-2
+      value: tenant-1
