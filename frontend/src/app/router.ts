@@ -17,8 +17,24 @@ export const router = createRouter({
     },
     {
       path: '/',
+      redirect: () => {
+        const { session } = useAuth()
+
+        if (session.value?.type === 'common') {
+          return { name: 'dashboard' }
+        }
+
+        if (session.value?.type === 'tenant' && session.value.tenantId) {
+          return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+        }
+
+        return { name: 'login' }
+      },
+    },
+    {
+      path: '/common',
       component: AppLayout,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, authType: 'common' },
       children: [
         {
           path: '',
@@ -29,16 +45,21 @@ export const router = createRouter({
           path: 'tenants',
           name: 'tenants',
           component: TenantsView,
-          meta: { authType: 'common' },
         },
         {
           path: 'common-users',
           name: 'common-users',
           component: CommonUsersView,
-          meta: { authType: 'common' },
         },
+      ],
+    },
+    {
+      path: '/:tenantSlug',
+      component: AppLayout,
+      meta: { requiresAuth: true },
+      children: [
         {
-          path: 'tenant-users',
+          path: 'users',
           name: 'tenant-users',
           component: TenantUsersView,
         },
@@ -51,6 +72,10 @@ router.beforeEach((to) => {
   const { isAuthenticated, session } = useAuth()
 
   if (to.name === 'login' && isAuthenticated.value) {
+    if (session.value?.type === 'tenant' && session.value.tenantId) {
+      return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+    }
+
     return { name: 'dashboard' }
   }
 
@@ -59,7 +84,21 @@ router.beforeEach((to) => {
   }
 
   if (to.meta.authType && session.value?.type !== to.meta.authType) {
-    return { name: 'dashboard' }
+    if (session.value?.type === 'tenant' && session.value.tenantId) {
+      return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+    }
+
+    return { name: 'login' }
+  }
+
+  if (to.name === 'tenant-users' && session.value?.type === 'tenant') {
+    const tenantSlug = Array.isArray(to.params.tenantSlug)
+      ? to.params.tenantSlug[0]
+      : to.params.tenantSlug
+
+    if (tenantSlug !== session.value.tenantId) {
+      return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+    }
   }
 
   return true

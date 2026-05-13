@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { Pencil, Plus, Search, Trash2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import {
@@ -30,7 +31,13 @@ import type { User } from '@/shared/types/api'
 import { useAuth } from '@/features/auth/composables/useAuth'
 
 const { session } = useAuth()
-const selectedTenantId = ref(session.value?.tenantId || '')
+const route = useRoute()
+const router = useRouter()
+const routeTenantSlug = computed(() => {
+  const value = route.params.tenantSlug
+  return Array.isArray(value) ? value[0] : value
+})
+const selectedTenantId = ref(routeTenantSlug.value || session.value?.tenantId || '')
 const users = ref<User[]>([])
 const editingUser = ref<User | null>(null)
 const isLoading = ref(false)
@@ -56,6 +63,14 @@ function resetForm() {
 async function loadUsers() {
   if (!canLoad.value) {
     errorMessage.value = 'Enter a tenant id first'
+    return
+  }
+
+  if (selectedTenantId.value !== routeTenantSlug.value) {
+    await router.push({
+      name: 'tenant-users',
+      params: { tenantSlug: selectedTenantId.value },
+    })
     return
   }
 
@@ -125,6 +140,14 @@ async function removeUser(user: User) {
 }
 
 onMounted(() => {
+  if (selectedTenantId.value) {
+    void loadUsers()
+  }
+})
+
+watch(routeTenantSlug, (tenantSlug) => {
+  selectedTenantId.value = tenantSlug || session.value?.tenantId || ''
+
   if (selectedTenantId.value) {
     void loadUsers()
   }

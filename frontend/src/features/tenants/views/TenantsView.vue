@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
-import { Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { Pencil, Plus, Trash2, Users } from 'lucide-vue-next'
+import { RouterLink } from 'vue-router'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -158,7 +159,7 @@ onMounted(loadTenants)
             <TableHead>Slug</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead class="w-32 text-right">
+            <TableHead class="w-44 text-right">
               Actions
             </TableHead>
           </TableRow>
@@ -188,10 +189,20 @@ onMounted(loadTenants)
               </TableCell>
               <TableCell>
                 <div class="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon-sm"
-                    aria-label="Edit tenant"
+                <Button
+                  as-child
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Open tenant users"
+                >
+                  <RouterLink :to="`/${tenant.slug}/users`">
+                    <Users class="h-4 w-4" />
+                  </RouterLink>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  aria-label="Edit tenant"
                     @click="openEdit(tenant)"
                   >
                     <Pencil class="h-4 w-4" />

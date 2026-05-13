@@ -36,7 +36,7 @@ async function submitCommon() {
 
   try {
     await loginCommon(commonEmail.value, commonPassword.value)
-    await router.push('/')
+    await router.push('/common')
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Login failed'
   } finally {
@@ -50,7 +50,7 @@ async function submitTenant() {
 
   try {
     await loginTenant(tenantId.value, tenantEmail.value, tenantPassword.value)
-    await router.push('/')
+    await router.push(`/${tenantId.value}/users`)
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Login failed'
   } finally {

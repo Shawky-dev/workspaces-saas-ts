@@ -21,14 +21,21 @@ const { isDark, toggleTheme } = useTheme()
 const { logout, session } = useAuth()
 
 const navItems = computed(() => {
-  const items = [
-    { label: 'Dashboard', to: '/', icon: LayoutDashboard, common: true, tenant: true },
-    { label: 'Tenants', to: '/tenants', icon: Building2, common: true, tenant: false },
-    { label: 'Common Users', to: '/common-users', icon: Users, common: true, tenant: false },
-    { label: 'Tenant Users', to: '/tenant-users', icon: Users, common: true, tenant: true },
-  ]
+  if (session.value?.type === 'tenant' && session.value.tenantId) {
+    return [
+      {
+        label: 'Tenant Users',
+        to: `/${session.value.tenantId}/users`,
+        icon: Users,
+      },
+    ]
+  }
 
-  return items.filter((item) => session.value?.type === 'common' ? item.common : item.tenant)
+  return [
+    { label: 'Dashboard', to: '/common', icon: LayoutDashboard },
+    { label: 'Tenants', to: '/common/tenants', icon: Building2 },
+    { label: 'Common Users', to: '/common/common-users', icon: Users },
+  ]
 })
 
 function handleLogout() {
