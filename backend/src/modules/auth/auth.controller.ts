@@ -1,7 +1,11 @@
-import { Controller, Post, Body, Param } from '@nestjs/common'
+import { Controller, Post, Body, Param, Get, UseGuards } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { CommonLoginDto } from './dto/common-login.dto'
 import { TenantLoginDto } from './dto/tenant-login.dto'
+import { CommonAuthGuard } from './guards/common-auth.guard'
+import { TenantAuthGuard } from './guards/tenant-auth.guard'
+import { CommonUser } from './decorators/common-user.decorator'
+import { TenantUser } from './decorators/tenant-user.decorator'
 
 /**
  * Authentication endpoints for both platform-level users and tenant-scoped users.
@@ -31,6 +35,12 @@ export class AuthController {
         return this.authService.loginCommon(user)
     }
 
+    @UseGuards(CommonAuthGuard)
+    @Get('common/me')
+    async commonMe(@CommonUser() user: any) {
+        return { user }
+    }
+
     /**
      * Authenticates a tenant user and returns a JWT access token plus a public user payload.
      *
@@ -52,5 +62,11 @@ export class AuthController {
             tenantLoginDto.password,
         )
         return this.authService.loginTenant(user, tenantId)
+    }
+
+    @UseGuards(TenantAuthGuard)
+    @Get(':tenantId/me')
+    async tenantMe(@TenantUser() user: any) {
+        return { user }
     }
 }

@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common'
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user'
+import { UpdateUserDto } from './dto/update-user'
 
 /**
  * REST controller for tenant-scoped user management.
@@ -27,5 +28,30 @@ export class UserController {
         @Param('tenantId') tenantId: string,
     ) {
         return this.users.findAllUsers(tenantId)
+    }
+
+    @Get(':id')
+    async findOne(
+        @Param('tenantId') tenantId: string,
+        @Param('id') id: string,
+    ) {
+        return this.users.findPublicById(tenantId, id)
+    }
+
+    @Patch(':id')
+    async update(
+        @Param('tenantId') tenantId: string,
+        @Param('id') id: string,
+        @Body() dto: UpdateUserDto,
+    ) {
+        return this.users.updateUser(tenantId, id, dto)
+    }
+
+    @Delete(':id')
+    async remove(
+        @Param('tenantId') tenantId: string,
+        @Param('id') id: string,
+    ) {
+        return this.users.deleteUser(tenantId, id)
     }
 }

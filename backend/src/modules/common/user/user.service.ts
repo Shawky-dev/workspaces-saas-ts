@@ -8,6 +8,8 @@ import {
 } from './user.schema'
 
 import { CommonRepository } from 'src/public/db/common.repository'
+import { CreateUserDto } from './dto/create-user'
+import { UpdateUserDto } from './dto/update-user'
 /**
  * Service for managing platform-level users in the **common database**.
  *
@@ -28,12 +30,24 @@ export class UserService
         super(model)
     }
 
-    async createUser(data: Partial<UserDocument>) {
-        return this.createDocument(data)
+    private toPublicUser(user: any) {
+        return {
+            id: user._id,
+            email: user.email,
+            name: user.name,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        }
+    }
+
+    async createUser(data: CreateUserDto) {
+        const user = await this.createDocument(data)
+        return this.toPublicUser(user)
     }
 
     async findAllUsers() {
-        return this.findAll()
+        const users = await this.findAll()
+        return users.map((user) => this.toPublicUser(user))
     }
 
     /**
@@ -54,5 +68,34 @@ export class UserService
      */
     async findById(id: string) {
         return super.findById(id)
+    }
+
+    async findPublicById(id: string) {
+        const user = await super.findById(id)
+        return this.toPublicUser(user)
+    }
+
+    async updateUser(id: string, data: UpdateUserDto) {
+        const model = this.modelFor()
+        const user = await model.findById(id)
+
+        if (!user) {
+            return super.findById(id)
+        }
+
+        user.set(data)
+        const savedUser = await user.save()
+        return this.toPublicUser(savedUser)
+    }
+
+    async deleteUser(id: string) {
+        const model = this.modelFor()
+        const user = await model.findByIdAndDelete(id).lean()
+
+        if (!user) {
+            return super.findById(id)
+        }
+
+        return this.toPublicUser(user)
     }
 }

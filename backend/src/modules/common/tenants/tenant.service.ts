@@ -5,12 +5,12 @@ import { Model } from 'mongoose'
 
 import { TENANT_MODEL_NAME, TenantDocument } from './tenant.schema'
 import { CreateTenantDto } from './dto/create-tenant'
-import { BaseRepository } from 'src/public/db/base.repository'
 import { TenantBootstrapService } from './bootstrap/bootstrap.service'
 import { CreateUserDto } from 'src/modules/tenant/user/dto/create-user'
 import { CommonRepository } from 'src/public/db/common.repository'
 import { TenantBootstrapPayload } from './bootstrap/bootstrap.interface'
 import { UserBootstrapPayload } from 'src/modules/tenant/user/user.bootstrapper'
+import { UpdateTenantDto } from './dto/update-tenant'
 
 
 @Injectable()
@@ -64,5 +64,29 @@ export class TenantService extends CommonRepository<TenantDocument> {
 
     async getTenantBySlug(slug: string) {
         return this.findOne({ slug })
+    }
+
+    async updateTenant(slug: string, dto: UpdateTenantDto) {
+        const tenant = await this.modelFor()
+            .findOneAndUpdate({ slug }, dto, { new: true })
+            .lean()
+
+        if (!tenant) {
+            return this.getTenantBySlug(slug)
+        }
+
+        return tenant
+    }
+
+    async deleteTenant(slug: string) {
+        const tenant = await this.modelFor()
+            .findOneAndDelete({ slug })
+            .lean()
+
+        if (!tenant) {
+            return this.getTenantBySlug(slug)
+        }
+
+        return tenant
     }
 }

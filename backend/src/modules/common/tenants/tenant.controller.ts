@@ -1,13 +1,16 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     Param,
+    Patch,
     Post,
 } from '@nestjs/common'
 
 import { TenantService } from './tenant.service'
 import { CreateTenantDto } from './dto/create-tenant'
+import { UpdateTenantDto } from './dto/update-tenant'
 
 @Controller('tenants')
 export class TenantController {
@@ -36,5 +39,20 @@ export class TenantController {
         return this.tenantService.getTenantBySlug(
             slug,
         )
+    }
+
+    @Patch(':slug')
+    async update(
+        @Param('slug') slug: string,
+        @Body() dto: UpdateTenantDto,
+    ) {
+        return this.tenantService.updateTenant(slug, dto)
+    }
+
+    @Delete(':slug')
+    async remove(
+        @Param('slug') slug: string,
+    ) {
+        return this.tenantService.deleteTenant(slug)
     }
 }

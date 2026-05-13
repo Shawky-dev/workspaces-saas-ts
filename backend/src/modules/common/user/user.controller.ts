@@ -1,13 +1,17 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
+    Param,
+    Patch,
     Post,
 } from '@nestjs/common'
 
 import { UserService } from './user.service'
 
 import { CreateUserDto } from './dto/create-user'
+import { UpdateUserDto } from './dto/update-user'
 
 /**
  * REST controller for platform-level user management.
@@ -34,5 +38,27 @@ export class UserController {
     @Get()
     async findAll() {
         return this.users.findAllUsers()
+    }
+
+    @Get(':id')
+    async findOne(
+        @Param('id') id: string,
+    ) {
+        return this.users.findPublicById(id)
+    }
+
+    @Patch(':id')
+    async update(
+        @Param('id') id: string,
+        @Body() dto: UpdateUserDto,
+    ) {
+        return this.users.updateUser(id, dto)
+    }
+
+    @Delete(':id')
+    async remove(
+        @Param('id') id: string,
+    ) {
+        return this.users.deleteUser(id)
     }
 }
