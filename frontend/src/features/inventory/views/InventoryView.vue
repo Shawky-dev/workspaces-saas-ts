@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
 import {
   AlertCircle,
+  ImageIcon,
   Minus,
   PackageOpen,
   Plus,
@@ -35,6 +36,7 @@ import { useAuth } from '@/features/auth/composables/useAuth'
 import {
   adjustCatalogQuantity,
   bulkUpdateCatalogQuantities,
+  getCatalogItemImageBlob,
   listCatalogItems,
 } from '@/shared/api/resources'
 
@@ -62,6 +64,7 @@ const tenantId = computed(
 )
 
 const items = ref<InventoryRow[]>([])
+const thumbnails = ref<Record<string, string>>({})
 
 const isLoading = ref(false)
 const isSavingBulk = ref(false)
@@ -84,6 +87,42 @@ function mapInventoryItems(data: CatalogItem[]): InventoryRow[] {
   }))
 }
 
+function revokeThumbnails() {
+  Object.values(thumbnails.value).forEach((url) => URL.revokeObjectURL(url))
+  thumbnails.value = {}
+}
+
+async function loadThumbnails(nextItems: CatalogItem[]) {
+  revokeThumbnails()
+
+  const nextThumbnails: Record<string, string> = {}
+
+  await Promise.all(
+    nextItems
+      .filter((item) => item.hasImage)
+      .map(async (item) => {
+        try {
+          const blob = await getCatalogItemImageBlob(
+            tenantId.value,
+            item.id,
+            session.value?.accessToken,
+          )
+
+          nextThumbnails[item.id] = URL.createObjectURL(blob)
+        }
+        catch {
+          nextThumbnails[item.id] = ''
+        }
+      }),
+  )
+
+  thumbnails.value = nextThumbnails
+}
+
+onBeforeUnmount(() => {
+  revokeThumbnails()
+})
+
 async function loadInventory() {
   if (!tenantId.value) {
     errorMessage.value = 'Tenant is required.'
@@ -100,6 +139,7 @@ async function loadInventory() {
     )
 
     items.value = mapInventoryItems(data)
+    await loadThumbnails(data)
   }
   catch (error) {
     errorMessage.value = error instanceof Error
@@ -277,6 +317,10 @@ watch(
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead class="w-24">
+              Image
+            </TableHead>
+
             <TableHead>
               Product
             </TableHead>
@@ -298,7 +342,7 @@ watch(
         <TableBody>
           <TableRow v-if="isLoading">
             <TableCell
-              colspan="4"
+              colspan="5"
               class="text-muted-foreground"
             >
               Loading inventory...
@@ -310,6 +354,21 @@ watch(
               v-for="item in items"
               :key="item.id"
             >
+              <TableCell>
+                <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-md border bg-muted">
+                  <img
+                    v-if="thumbnails[item.id]"
+                    :src="thumbnails[item.id]"
+                    :alt="item.name"
+                    class="h-full w-full object-cover"
+                  >
+                  <ImageIcon
+                    v-else
+                    class="h-4 w-4 text-muted-foreground"
+                  />
+                </div>
+              </TableCell>
+
               <TableCell>
                 <div class="grid gap-1">
                   <span class="font-medium">
@@ -376,7 +435,7 @@ watch(
             v-if="!isLoading && items.length === 0"
           >
             <TableCell
-              colspan="4"
+              colspan="5"
               class="text-muted-foreground"
             >
               No catalog products yet.
