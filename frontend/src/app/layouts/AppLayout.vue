@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   Building2,
+  Boxes,
   LayoutDashboard,
   LogOut,
   MoonStar,
@@ -28,6 +29,11 @@ const navItems = computed(() => {
         label: 'Catalog',
         to: `/${session.value.tenantId}/catalog`,
         icon: Package,
+      },
+      {
+        label: 'Inventory',
+        to: `/${session.value.tenantId}/inventory`,
+        icon: Boxes,
       },
       {
         label: 'Tenant Users',

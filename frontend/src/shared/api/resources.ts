@@ -1,6 +1,7 @@
 import { apiBlobRequest, apiRequest, resolveApiUrl } from './client'
 import type {
   AuthResponse,
+  BulkUpdateCatalogQuantityItem,
   CatalogItem,
   CreateCatalogItemPayload,
   CreateTenantPayload,
@@ -140,6 +141,10 @@ function catalogItemFormData(payload: CreateCatalogItemPayload | UpdateCatalogIt
     formData.append('description', payload.description)
   }
 
+  if (payload.quantityOnHand !== undefined) {
+    formData.append('quantityOnHand', String(payload.quantityOnHand))
+  }
+
   if (payload.image) {
     formData.append('image', payload.image)
   }
@@ -189,4 +194,29 @@ export function getCatalogItemImageUrl(tenantId: string, id: string) {
 
 export function getCatalogItemImageBlob(tenantId: string, id: string, token?: string | null) {
   return apiBlobRequest(`/${tenantId}/catalog/items/${id}/image`, { token })
+}
+
+export function bulkUpdateCatalogQuantities(
+  tenantId: string,
+  items: BulkUpdateCatalogQuantityItem[],
+  token?: string | null,
+) {
+  return apiRequest<CatalogItem[]>(`/${tenantId}/catalog/items/quantities`, {
+    method: 'PATCH',
+    body: JSON.stringify({ items }),
+    token,
+  })
+}
+
+export function adjustCatalogQuantity(
+  tenantId: string,
+  id: string,
+  delta: number,
+  token?: string | null,
+) {
+  return apiRequest<CatalogItem>(`/${tenantId}/catalog/items/${id}/adjust-quantity`, {
+    method: 'POST',
+    body: JSON.stringify({ delta }),
+    token,
+  })
 }

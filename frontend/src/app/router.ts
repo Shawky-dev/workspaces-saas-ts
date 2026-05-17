@@ -7,6 +7,7 @@ import TenantsView from '@/features/tenants/views/TenantsView.vue'
 import CommonUsersView from '@/features/common-users/views/CommonUsersView.vue'
 import TenantUsersView from '@/features/tenant-users/views/TenantUsersView.vue'
 import CatalogView from '@/features/catalog/views/CatalogView.vue'
+import InventoryView from '@/features/inventory/views/InventoryView.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -70,6 +71,12 @@ export const router = createRouter({
           component: CatalogView,
           meta: { authType: 'tenant' },
         },
+        {
+          path: 'inventory',
+          name: 'tenant-inventory',
+          component: InventoryView,
+          meta: { authType: 'tenant' },
+        },
       ],
     },
   ],
@@ -102,7 +109,10 @@ router.beforeEach((to) => {
     return { name: 'login' }
   }
 
-  if ((to.name === 'tenant-users' || to.name === 'tenant-catalog') && session.value?.type === 'tenant') {
+  if (
+    (to.name === 'tenant-users' || to.name === 'tenant-catalog' || to.name === 'tenant-inventory')
+    && session.value?.type === 'tenant'
+  ) {
     const tenantSlug = Array.isArray(to.params.tenantSlug)
       ? to.params.tenantSlug[0]
       : to.params.tenantSlug

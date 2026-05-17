@@ -63,6 +63,7 @@ export interface CatalogItem {
   purchasePrice: number
   soldPrice: number
   description: string
+  quantityOnHand: number
   image: CatalogItemImage | null
   hasImage: boolean
   imageUrl: string | null
@@ -75,6 +76,7 @@ export interface CreateCatalogItemPayload {
   purchasePrice: number
   soldPrice: number
   description?: string
+  quantityOnHand?: number
   image?: File | null
 }
 
@@ -83,5 +85,11 @@ export interface UpdateCatalogItemPayload {
   purchasePrice?: number
   soldPrice?: number
   description?: string
+  quantityOnHand?: number
   image?: File | null
+}
+
+export interface BulkUpdateCatalogQuantityItem {
+  id: string
+  quantityOnHand: number
 }
