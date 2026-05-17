@@ -100,18 +100,35 @@ export class CatalogService extends TenantRepository<CatalogItemDocument> {
     }
 
     async findImageById(tenantId: string, id: string) {
-        const item = await this.modelFor(tenantId).findById(id).lean()
+        const item = await this.modelFor(tenantId).findById(id)
 
         if (!item || !item.imageData || !item.imageContentType) {
             throw new NotFoundException('Catalog item image not found')
         }
+        const data = this.toBuffer(item.imageData)
 
         return {
-            data: Buffer.from(item.imageData),
+            data,
             contentType: item.imageContentType,
             originalName: item.imageOriginalName ?? 'catalog-item-image',
             size: item.imageSize,
         }
+    }
+
+    private toBuffer(data: any) {
+        if (Buffer.isBuffer(data)) {
+            return Buffer.from(data)
+        }
+
+        if (data?.buffer && Buffer.isBuffer(data.buffer)) {
+            return Buffer.from(data.buffer)
+        }
+
+        if (data?.buffer) {
+            return Buffer.from(data.buffer)
+        }
+
+        return Buffer.from(data)
     }
 
     private toImageFields(image?: UploadedCatalogImage) {
