@@ -50,7 +50,7 @@ async function submitTenant() {
 
   try {
     await loginTenant(tenantId.value, tenantEmail.value, tenantPassword.value)
-    await router.push(`/${tenantId.value}/users`)
+    await router.push(`/${tenantId.value}/catalog`)
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Login failed'
   } finally {
