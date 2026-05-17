@@ -6,6 +6,8 @@ import DashboardView from '@/features/dashboard/views/DashboardView.vue'
 import TenantsView from '@/features/tenants/views/TenantsView.vue'
 import CommonUsersView from '@/features/common-users/views/CommonUsersView.vue'
 import TenantUsersView from '@/features/tenant-users/views/TenantUsersView.vue'
+import CatalogView from '@/features/catalog/views/CatalogView.vue'
+import InventoryView from '@/features/inventory/views/InventoryView.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -25,7 +27,7 @@ export const router = createRouter({
         }
 
         if (session.value?.type === 'tenant' && session.value.tenantId) {
-          return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+          return { name: 'tenant-catalog', params: { tenantSlug: session.value.tenantId } }
         }
 
         return { name: 'login' }
@@ -63,6 +65,18 @@ export const router = createRouter({
           name: 'tenant-users',
           component: TenantUsersView,
         },
+        {
+          path: 'catalog',
+          name: 'tenant-catalog',
+          component: CatalogView,
+          meta: { authType: 'tenant' },
+        },
+        {
+          path: 'inventory',
+          name: 'tenant-inventory',
+          component: InventoryView,
+          meta: { authType: 'tenant' },
+        },
       ],
     },
   ],
@@ -73,7 +87,7 @@ router.beforeEach((to) => {
 
   if (to.name === 'login' && isAuthenticated.value) {
     if (session.value?.type === 'tenant' && session.value.tenantId) {
-      return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+      return { name: 'tenant-catalog', params: { tenantSlug: session.value.tenantId } }
     }
 
     return { name: 'dashboard' }
@@ -85,19 +99,26 @@ router.beforeEach((to) => {
 
   if (to.meta.authType && session.value?.type !== to.meta.authType) {
     if (session.value?.type === 'tenant' && session.value.tenantId) {
-      return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+      return { name: 'tenant-catalog', params: { tenantSlug: session.value.tenantId } }
+    }
+
+    if (session.value?.type === 'common') {
+      return { name: 'dashboard' }
     }
 
     return { name: 'login' }
   }
 
-  if (to.name === 'tenant-users' && session.value?.type === 'tenant') {
+  if (
+    (to.name === 'tenant-users' || to.name === 'tenant-catalog' || to.name === 'tenant-inventory')
+    && session.value?.type === 'tenant'
+  ) {
     const tenantSlug = Array.isArray(to.params.tenantSlug)
       ? to.params.tenantSlug[0]
       : to.params.tenantSlug
 
     if (tenantSlug !== session.value.tenantId) {
-      return { name: 'tenant-users', params: { tenantSlug: session.value.tenantId } }
+      return { name: to.name, params: { tenantSlug: session.value.tenantId } }
     }
   }
 

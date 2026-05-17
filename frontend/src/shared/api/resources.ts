@@ -1,10 +1,14 @@
-import { apiRequest } from './client'
+import { apiBlobRequest, apiRequest, resolveApiUrl } from './client'
 import type {
   AuthResponse,
+  BulkUpdateCatalogQuantityItem,
+  CatalogItem,
+  CreateCatalogItemPayload,
   CreateTenantPayload,
   CreateUserPayload,
   MeResponse,
   Tenant,
+  UpdateCatalogItemPayload,
   UpdateTenantPayload,
   UpdateUserPayload,
   User,
@@ -114,6 +118,105 @@ export function updateTenantUser(
 export function deleteTenantUser(tenantId: string, id: string, token?: string | null) {
   return apiRequest<User>(`/${tenantId}/users/${id}`, {
     method: 'DELETE',
+    token,
+  })
+}
+
+function catalogItemFormData(payload: CreateCatalogItemPayload | UpdateCatalogItemPayload) {
+  const formData = new FormData()
+
+  if (payload.name !== undefined) {
+    formData.append('name', payload.name)
+  }
+
+  if (payload.purchasePrice !== undefined) {
+    formData.append('purchasePrice', String(payload.purchasePrice))
+  }
+
+  if (payload.soldPrice !== undefined) {
+    formData.append('soldPrice', String(payload.soldPrice))
+  }
+
+  if (payload.description !== undefined) {
+    formData.append('description', payload.description)
+  }
+
+  if (payload.quantityOnHand !== undefined) {
+    formData.append('quantityOnHand', String(payload.quantityOnHand))
+  }
+
+  if (payload.image) {
+    formData.append('image', payload.image)
+  }
+
+  return formData
+}
+
+export function listCatalogItems(tenantId: string, token?: string | null) {
+  return apiRequest<CatalogItem[]>(`/${tenantId}/catalog/items`, { token })
+}
+
+export function createCatalogItem(
+  tenantId: string,
+  payload: CreateCatalogItemPayload,
+  token?: string | null,
+) {
+  return apiRequest<CatalogItem>(`/${tenantId}/catalog/items`, {
+    method: 'POST',
+    body: catalogItemFormData(payload),
+    token,
+  })
+}
+
+export function updateCatalogItem(
+  tenantId: string,
+  id: string,
+  payload: UpdateCatalogItemPayload,
+  token?: string | null,
+) {
+  return apiRequest<CatalogItem>(`/${tenantId}/catalog/items/${id}`, {
+    method: 'PATCH',
+    body: catalogItemFormData(payload),
+    token,
+  })
+}
+
+export function deleteCatalogItem(tenantId: string, id: string, token?: string | null) {
+  return apiRequest<CatalogItem>(`/${tenantId}/catalog/items/${id}`, {
+    method: 'DELETE',
+    token,
+  })
+}
+
+export function getCatalogItemImageUrl(tenantId: string, id: string) {
+  return resolveApiUrl(`/${tenantId}/catalog/items/${id}/image`)
+}
+
+export function getCatalogItemImageBlob(tenantId: string, id: string, token?: string | null) {
+  return apiBlobRequest(`/${tenantId}/catalog/items/${id}/image`, { token })
+}
+
+export function bulkUpdateCatalogQuantities(
+  tenantId: string,
+  items: BulkUpdateCatalogQuantityItem[],
+  token?: string | null,
+) {
+  return apiRequest<CatalogItem[]>(`/${tenantId}/catalog/items/quantities`, {
+    method: 'PATCH',
+    body: JSON.stringify({ items }),
+    token,
+  })
+}
+
+export function adjustCatalogQuantity(
+  tenantId: string,
+  id: string,
+  delta: number,
+  token?: string | null,
+) {
+  return apiRequest<CatalogItem>(`/${tenantId}/catalog/items/${id}/adjust-quantity`, {
+    method: 'POST',
+    body: JSON.stringify({ delta }),
     token,
   })
 }

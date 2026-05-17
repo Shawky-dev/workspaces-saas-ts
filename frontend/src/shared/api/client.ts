@@ -13,7 +13,7 @@ interface RequestOptions extends RequestInit {
   token?: string | null
 }
 
-function resolveUrl(path: string) {
+export function resolveApiUrl(path: string) {
   return `${API_BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
 }
 
@@ -32,8 +32,9 @@ export async function apiRequest<T>(
   options: RequestOptions = {},
 ): Promise<T> {
   const headers = new Headers(options.headers)
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData
 
-  if (!headers.has('Content-Type') && options.body) {
+  if (!headers.has('Content-Type') && options.body && !isFormData) {
     headers.set('Content-Type', 'application/json')
   }
 
@@ -41,7 +42,7 @@ export async function apiRequest<T>(
     headers.set('Authorization', `Bearer ${options.token}`)
   }
 
-  const response = await fetch(resolveUrl(path), {
+  const response = await fetch(resolveApiUrl(path), {
     ...options,
     headers,
   })
@@ -56,4 +57,31 @@ export async function apiRequest<T>(
   }
 
   return payload as T
+}
+
+export async function apiBlobRequest(
+  path: string,
+  options: RequestOptions = {},
+): Promise<Blob> {
+  const headers = new Headers(options.headers)
+
+  if (options.token) {
+    headers.set('Authorization', `Bearer ${options.token}`)
+  }
+
+  const response = await fetch(resolveApiUrl(path), {
+    ...options,
+    headers,
+  })
+
+  if (!response.ok) {
+    const payload = await parseResponse(response)
+    const message = payload?.message
+    throw new ApiError(
+      Array.isArray(message) ? message.join(', ') : message || 'Request failed',
+      response.status,
+    )
+  }
+
+  return response.blob()
 }

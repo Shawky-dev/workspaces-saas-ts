@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import {
   Building2,
+  Boxes,
   LayoutDashboard,
   LogOut,
   MoonStar,
+  Package,
   SunMedium,
   Users,
 } from 'lucide-vue-next'
@@ -23,6 +25,16 @@ const { logout, session } = useAuth()
 const navItems = computed(() => {
   if (session.value?.type === 'tenant' && session.value.tenantId) {
     return [
+      {
+        label: 'Catalog',
+        to: `/${session.value.tenantId}/catalog`,
+        icon: Package,
+      },
+      {
+        label: 'Inventory',
+        to: `/${session.value.tenantId}/inventory`,
+        icon: Boxes,
+      },
       {
         label: 'Tenant Users',
         to: `/${session.value.tenantId}/users`,

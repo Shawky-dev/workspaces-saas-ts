@@ -50,3 +50,46 @@ export interface UpdateTenantPayload {
   name?: string
   enabled?: boolean
 }
+
+export interface CatalogItemImage {
+  contentType: string
+  originalName?: string
+  size?: number
+}
+
+export interface CatalogItem {
+  id: string
+  name: string
+  purchasePrice: number
+  soldPrice: number
+  description: string
+  quantityOnHand: number
+  image: CatalogItemImage | null
+  hasImage: boolean
+  imageUrl: string | null
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface CreateCatalogItemPayload {
+  name: string
+  purchasePrice: number
+  soldPrice: number
+  description?: string
+  quantityOnHand?: number
+  image?: File | null
+}
+
+export interface UpdateCatalogItemPayload {
+  name?: string
+  purchasePrice?: number
+  soldPrice?: number
+  description?: string
+  quantityOnHand?: number
+  image?: File | null
+}
+
+export interface BulkUpdateCatalogQuantityItem {
+  id: string
+  quantityOnHand: number
+}
