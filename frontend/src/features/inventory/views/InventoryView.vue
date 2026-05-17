@@ -1,7 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
-import { AlertCircle, Minus, PackageOpen, Plus, RotateCcw, Save } from 'lucide-vue-next'
+
+import {
+  AlertCircle,
+  Minus,
+  PackageOpen,
+  Plus,
+  RotateCcw,
+  Save,
+} from 'lucide-vue-next'
 
 import {
   Alert,
@@ -12,7 +20,6 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 
 import {
   Table,
@@ -33,21 +40,28 @@ import {
 
 import type { CatalogItem } from '@/shared/types/api'
 
+type InventoryRow = CatalogItem & {
+  draftQuantity: number
+}
+
 const route = useRoute()
 const { session } = useAuth()
 
 const routeTenantSlug = computed(() => {
   const value = route.params.tenantSlug
-  return Array.isArray(value) ? value[0] : value
+
+  return Array.isArray(value)
+    ? value[0]
+    : value
 })
 
 const tenantId = computed(
-  () => routeTenantSlug.value || session.value?.tenantId || '',
+  () => routeTenantSlug.value
+    || session.value?.tenantId
+    || '',
 )
 
-const items = ref<CatalogItem[]>([])
-
-const quantityDrafts = reactive<Record<string, string>>({})
+const items = ref<InventoryRow[]>([])
 
 const isLoading = ref(false)
 const isSavingBulk = ref(false)
@@ -58,30 +72,16 @@ const successMessage = ref('')
 
 const hasItems = computed(() => items.value.length > 0)
 
-function syncDrafts(nextItems: CatalogItem[]) {
-  Object.keys(quantityDrafts).forEach((key) => delete quantityDrafts[key])
-
-  nextItems.forEach((item) => {
-    quantityDrafts[item.id] = String(item.quantityOnHand ?? 0)
-  })
+function clearMessages() {
+  errorMessage.value = ''
+  successMessage.value = ''
 }
 
-function parseWholeNumber(value: string | number) {
-  const normalized = String(value).trim()
-
-  if (!/^\d+$/.test(normalized)) {
-    return null
-  }
-
-  const parsed = Number(normalized)
-
-  return Number.isSafeInteger(parsed)
-    ? parsed
-    : null
-}
-
-function rowQuantity(item: CatalogItem) {
-  return item.quantityOnHand ?? 0
+function mapInventoryItems(data: CatalogItem[]): InventoryRow[] {
+  return data.map(item => ({
+    ...item,
+    draftQuantity: item.quantityOnHand ?? 0,
+  }))
 }
 
 async function loadInventory() {
@@ -91,18 +91,15 @@ async function loadInventory() {
   }
 
   isLoading.value = true
-  errorMessage.value = ''
-  successMessage.value = ''
+  clearMessages()
 
   try {
-    const nextItems = await listCatalogItems(
+    const data = await listCatalogItems(
       tenantId.value,
       session.value?.accessToken,
     )
 
-    items.value = nextItems
-
-    syncDrafts(nextItems)
+    items.value = mapInventoryItems(data)
   }
   catch (error) {
     errorMessage.value = error instanceof Error
@@ -114,38 +111,30 @@ async function loadInventory() {
   }
 }
 
-async function saveBulkQuantities() {
-  const payload = items.value.map((item) => {
-    const quantityOnHand = parseWholeNumber(
-      quantityDrafts[item.id] ?? '',
-    )
-
-    if (quantityOnHand === null) {
-      throw new Error(
-        `${item.name} quantity must be a whole number of 0 or more.`,
-      )
-    }
-
-    return {
-      id: item.id,
-      quantityOnHand,
-    }
-  })
+async function saveAllQuantities() {
+  if (!items.value.length) {
+    return
+  }
 
   isSavingBulk.value = true
-  errorMessage.value = ''
-  successMessage.value = ''
+  clearMessages()
 
   try {
-    const updatedItems = await bulkUpdateCatalogQuantities(
+    const payload = items.value.map(item => ({
+      id: item.id,
+      quantityOnHand: Math.max(
+        0,
+        Math.floor(item.draftQuantity || 0),
+      ),
+    }))
+
+    const updated = await bulkUpdateCatalogQuantities(
       tenantId.value,
       payload,
       session.value?.accessToken,
     )
 
-    items.value = updatedItems
-
-    syncDrafts(updatedItems)
+    items.value = mapInventoryItems(updated)
 
     successMessage.value = 'Inventory quantities saved.'
   }
@@ -159,104 +148,69 @@ async function saveBulkQuantities() {
   }
 }
 
-async function handleBulkSave() {
-  try {
-    await saveBulkQuantities()
-  }
-  catch (error) {
-    errorMessage.value = error instanceof Error
-      ? error.message
-      : 'Check quantity values'
-  }
-}
-
-async function applyAdjustment(item: CatalogItem, delta: number) {
-  if (rowQuantity(item) + delta < 0) {
-    errorMessage.value = `${item.name} cannot go below zero.`
-    successMessage.value = ''
-    return
-  }
-
-  adjustingItemId.value = item.id
-
-  errorMessage.value = ''
-  successMessage.value = ''
-
-  try {
-    const updatedItem = await adjustCatalogQuantity(
-      tenantId.value,
-      item.id,
-      delta,
-      session.value?.accessToken,
-    )
-
-    const index = items.value.findIndex(
-      currentItem => currentItem.id === item.id,
-    )
-
-    if (index >= 0) {
-      items.value[index] = updatedItem
-    }
-
-    quantityDrafts[item.id] = String(
-      updatedItem.quantityOnHand,
-    )
-
-    successMessage.value = `${updatedItem.name} quantity updated.`
-  }
-  catch (error) {
-    errorMessage.value = error instanceof Error
-      ? error.message
-      : 'Could not adjust quantity'
-  }
-  finally {
-    adjustingItemId.value = ''
-  }
-}
-
-async function saveItemQuantity(item: CatalogItem) {
-  const targetQuantity = parseWholeNumber(
-    quantityDrafts[item.id] ?? '',
+async function saveItemQuantity(item: InventoryRow) {
+  const nextQuantity = Math.max(
+    0,
+    Math.floor(item.draftQuantity || 0),
   )
 
-  if (targetQuantity === null) {
-    errorMessage.value = 'Quantity must be a whole number of 0 or more.'
-    successMessage.value = ''
-    return
-  }
+  const currentQuantity = item.quantityOnHand ?? 0
 
-  const delta = targetQuantity - rowQuantity(item)
+  const delta = nextQuantity - currentQuantity
 
   if (delta === 0) {
     successMessage.value = 'No changes to save.'
     return
   }
 
-  void applyAdjustment(item, delta)
+  adjustingItemId.value = item.id
+  clearMessages()
+
+  try {
+    const updated = await adjustCatalogQuantity(
+      tenantId.value,
+      item.id,
+      delta,
+      session.value?.accessToken,
+    )
+
+    Object.assign(item, {
+      ...updated,
+      draftQuantity: updated.quantityOnHand ?? 0,
+    })
+
+    successMessage.value = `${updated.name} quantity updated.`
+  }
+  catch (error) {
+    errorMessage.value = error instanceof Error
+      ? error.message
+      : 'Could not update quantity'
+  }
+  finally {
+    adjustingItemId.value = ''
+  }
 }
 
-function incrementQuantity(item: CatalogItem) {
-  quantityDrafts[item.id] = String(
-    Number(quantityDrafts[item.id] || 0) + 1,
+function incrementQuantity(item: InventoryRow) {
+  item.draftQuantity++
+}
+
+function decrementQuantity(item: InventoryRow) {
+  item.draftQuantity = Math.max(
+    0,
+    item.draftQuantity - 1,
   )
 }
 
-function decrementQuantity(item: CatalogItem) {
-  quantityDrafts[item.id] = String(
-    Math.max(
-      0,
-      Number(quantityDrafts[item.id] || 0) - 1,
-    ),
-  )
-}
-
-onMounted(() => {
-  void loadInventory()
-})
-
-watch(tenantId, () => {
-  void loadInventory()
-})
+watch(
+  tenantId,
+  () => {
+    void loadInventory()
+  },
+  {
+    immediate: true,
+  },
+)
 </script>
 
 <template>
@@ -284,7 +238,7 @@ watch(tenantId, () => {
 
         <Button
           :disabled="!hasItems || isSavingBulk"
-          @click="handleBulkSave"
+          @click="saveAllQuantities"
         >
           <Save class="h-4 w-4" />
           Save Quantities
@@ -370,28 +324,18 @@ watch(tenantId, () => {
 
               <TableCell>
                 <Badge variant="secondary">
-                  {{ rowQuantity(item) }}
+                  {{ item.quantityOnHand ?? 0 }}
                 </Badge>
               </TableCell>
 
               <TableCell>
-                <div class="grid gap-2">
-                  <Label
-                    :for="`quantity-${item.id}`"
-                    class="sr-only"
-                  >
-                    Quantity for {{ item.name }}
-                  </Label>
-
-                  <Input
-                    :id="`quantity-${item.id}`"
-                    v-model="quantityDrafts[item.id]"
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputmode="numeric"
-                  />
-                </div>
+                <Input
+                  v-model.number="item.draftQuantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                />
               </TableCell>
 
               <TableCell>
