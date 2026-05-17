@@ -27,6 +27,12 @@ export class CatalogItem {
     })
     description!: string
 
+    @Prop({
+        default: 0,
+        min: 0,
+    })
+    quantityOnHand!: number
+
     @Prop({ type: Buffer })
     imageData?: Buffer
 

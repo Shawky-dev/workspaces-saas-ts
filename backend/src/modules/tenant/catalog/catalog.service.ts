@@ -1,4 +1,9 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common'
+import {
+    BadRequestException,
+    Injectable,
+    Inject,
+    NotFoundException,
+} from '@nestjs/common'
 import { TENANT_MODEL_REGISTRY } from '@phen0menon/nestjs-mongoose-tenancy'
 import type { TenantModelRegistry } from '@phen0menon/nestjs-mongoose-tenancy'
 import { TenantRepository } from 'src/public/db/tenant.repository'
@@ -8,6 +13,8 @@ import {
 } from './catalog-item.schema'
 import { CreateCatalogItemDto } from './dto/create-catalog-item.dto'
 import { UpdateCatalogItemDto } from './dto/update-catalog-item.dto'
+import { BulkUpdateQuantitiesDto } from './dto/bulk-update-quantities.dto'
+import { AdjustQuantityDto } from './dto/adjust-quantity.dto'
 
 type UploadedCatalogImage = {
     buffer: Buffer
@@ -99,6 +106,75 @@ export class CatalogService extends TenantRepository<CatalogItemDocument> {
         return this.toPublicItem(tenantId, item)
     }
 
+    async bulkUpdateQuantities(
+        tenantId: string,
+        data: BulkUpdateQuantitiesDto,
+    ) {
+        const ids = data.items.map((item) => item.id)
+        const uniqueIds = new Set(ids)
+
+        if (uniqueIds.size !== ids.length) {
+            throw new BadRequestException('Duplicate catalog item ids are not allowed')
+        }
+
+        const model = this.modelFor(tenantId)
+        const existingItems = await model
+            .find({ _id: { $in: ids } })
+            .select('_id')
+            .lean()
+
+        if (existingItems.length !== ids.length) {
+            throw new NotFoundException('One or more catalog items were not found')
+        }
+
+        await model.bulkWrite(
+            data.items.map((item) => ({
+                updateOne: {
+                    filter: { _id: item.id },
+                    update: {
+                        $set: {
+                            quantityOnHand: item.quantityOnHand,
+                        },
+                    },
+                },
+            })),
+        )
+
+        const updatedItems = await model
+            .find({ _id: { $in: ids } })
+            .select('-imageData')
+            .lean()
+        const updatedById = new Map(
+            updatedItems.map((item: any) => [item._id.toString(), item]),
+        )
+
+        return ids.map((id) => this.toPublicItem(tenantId, updatedById.get(id)))
+    }
+
+    async adjustQuantity(
+        tenantId: string,
+        id: string,
+        data: AdjustQuantityDto,
+    ) {
+        const model = this.modelFor(tenantId)
+        const item = await model.findById(id)
+
+        if (!item) {
+            throw new NotFoundException('CatalogItem not found')
+        }
+
+        const nextQuantity = (item.quantityOnHand ?? 0) + data.delta
+
+        if (nextQuantity < 0) {
+            throw new BadRequestException('Quantity cannot be less than zero')
+        }
+
+        item.quantityOnHand = nextQuantity
+        const savedItem = await item.save()
+
+        return this.toPublicItem(tenantId, savedItem)
+    }
+
     async findImageById(tenantId: string, id: string) {
         const item = await this.modelFor(tenantId).findById(id)
 
@@ -154,6 +230,7 @@ export class CatalogService extends TenantRepository<CatalogItemDocument> {
             purchasePrice: item.purchasePrice,
             soldPrice: item.soldPrice,
             description: item.description,
+            quantityOnHand: item.quantityOnHand ?? 0,
             image: hasImage
                 ? {
                     contentType: item.imageContentType,

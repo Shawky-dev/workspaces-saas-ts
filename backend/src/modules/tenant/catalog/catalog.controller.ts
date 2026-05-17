@@ -19,6 +19,8 @@ import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
 import { CatalogService } from './catalog.service'
 import { CreateCatalogItemDto } from './dto/create-catalog-item.dto'
 import { UpdateCatalogItemDto } from './dto/update-catalog-item.dto'
+import { BulkUpdateQuantitiesDto } from './dto/bulk-update-quantities.dto'
+import { AdjustQuantityDto } from './dto/adjust-quantity.dto'
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 const ALLOWED_IMAGE_TYPES = new Set([
@@ -92,6 +94,23 @@ export class CatalogController {
         @Param('id') id: string,
     ) {
         return this.catalog.findPublicById(tenantId, id)
+    }
+
+    @Patch('quantities')
+    async bulkUpdateQuantities(
+        @Param('tenantId') tenantId: string,
+        @Body() dto: BulkUpdateQuantitiesDto,
+    ) {
+        return this.catalog.bulkUpdateQuantities(tenantId, dto)
+    }
+
+    @Post(':id/adjust-quantity')
+    async adjustQuantity(
+        @Param('tenantId') tenantId: string,
+        @Param('id') id: string,
+        @Body() dto: AdjustQuantityDto,
+    ) {
+        return this.catalog.adjustQuantity(tenantId, id, dto)
     }
 
     @Patch(':id')

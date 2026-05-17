@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer'
 import {
     IsNotEmpty,
+    IsInt,
     IsNumber,
     IsOptional,
     IsString,
@@ -25,4 +26,10 @@ export class CreateCatalogItemDto {
     @IsString()
     @IsOptional()
     description?: string
+
+    @Type(() => Number)
+    @IsInt()
+    @Min(0)
+    @IsOptional()
+    quantityOnHand?: number
 }

@@ -21,6 +21,9 @@ http:
       - name: description
         value: Updated workspace snack item
         type: text
+      - name: quantityOnHand
+        value: "30"
+        type: text
       - name: image
         value: ""
         type: file
