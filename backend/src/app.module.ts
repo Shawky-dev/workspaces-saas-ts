@@ -10,6 +10,7 @@ import { CommonUserModule } from './modules/common/user/user.module'
 import { TenantBootstrapModule } from './modules/common/tenants/bootstrap/bootstrap.module'
 import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './modules/auth/auth.module'
+import { CatalogModule } from './modules/tenant/catalog/catalog.module'
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from './modules/auth/auth.module'
     TenantBootstrapModule,
     //_TENANT
     TenantUserModule,
+    CatalogModule,
   ],
 })
 export class AppModule { }
