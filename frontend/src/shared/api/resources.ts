@@ -220,3 +220,48 @@ export function adjustCatalogQuantity(
     token,
   })
 }
+
+export function listRooms(
+  tenantId: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms`, {
+    token,
+  })
+}
+
+export function createRoom(
+  tenantId: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function updateRoom(
+  tenantId: string,
+  id: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function deleteRoom(
+  tenantId: string,
+  id: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms/${id}`, {
+    method: 'DELETE',
+    token,
+  })
+}
