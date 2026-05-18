@@ -12,6 +12,7 @@ import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './modules/auth/auth.module'
 import { CatalogModule } from './modules/tenant/catalog/catalog.module'
 import { RoomModule } from './modules/tenant/room/room.module'
+import { CustomerModule } from './modules/tenant/customer/customer.module'
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RoomModule } from './modules/tenant/room/room.module'
     TenantUserModule,
     CatalogModule,
     RoomModule,
+    CustomerModule,
   ],
 })
 export class AppModule { }
