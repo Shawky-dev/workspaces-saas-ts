@@ -1,0 +1,24 @@
+info:
+  name: create-room
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{URL}}/{{tenantId}}/rooms"
+  body:
+    type: json
+    data: |-
+      {
+        "name":"Conference Room A",
+        "type":"public",
+        "ratePerHour":25,
+        "seats":10
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
