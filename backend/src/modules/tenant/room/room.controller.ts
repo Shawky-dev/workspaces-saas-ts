@@ -6,13 +6,16 @@ import {
     Param,
     Patch,
     Post,
+    UseGuards,
 } from '@nestjs/common'
 
+import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
 import { RoomService } from './room.service'
 
 import { CreateRoomDto } from './dto/create-room.dto'
 import { UpdateRoomDto } from './dto/update-room.dto'
 
+@UseGuards(TenantAuthGuard)
 @Controller(':tenantId/rooms')
 export class RoomController {
     constructor(private readonly roomService: RoomService) {}
