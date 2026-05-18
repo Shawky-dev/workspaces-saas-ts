@@ -11,6 +11,7 @@ import { TenantBootstrapModule } from './modules/common/tenants/bootstrap/bootst
 import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './modules/auth/auth.module'
 import { CatalogModule } from './modules/tenant/catalog/catalog.module'
+import { RoomModule } from './modules/tenant/room/room.module'
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CatalogModule } from './modules/tenant/catalog/catalog.module'
     //_TENANT
     TenantUserModule,
     CatalogModule,
+    RoomModule,
   ],
 })
 export class AppModule { }
