@@ -265,3 +265,47 @@ export function deleteRoom(
     token,
   })
 }
+export function listCustomers(
+  tenantId: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers`, {
+    token,
+  })
+}
+
+export function createCustomer(
+  tenantId: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function updateCustomer(
+  tenantId: string,
+  id: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function deleteCustomer(
+  tenantId: string,
+  id: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers/${id}`, {
+    method: 'DELETE',
+    token,
+  })
+}
