@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 import * as bcrypt from 'bcrypt'
+import { Role } from '../../auth/enums/role.enum'
 
 /**
  * Mongoose schema for a **tenant-scoped user** stored in a workspace database.
@@ -32,6 +33,8 @@ export class User {
     @Prop({ required: true })
     name!: string
 
+    @Prop({type: [String], enum: Role, default: [Role.USER],})
+    roles: Role[]
 }
 
 export type UserDocument = User & Document
