@@ -2,7 +2,10 @@ import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/commo
 import { UserService } from './user.service'
 import { CreateUserDto } from './dto/create-user'
 import { UpdateUserDto } from './dto/update-user'
-
+import { TenantAuthGuard } from '../../auth/guards/tenant-auth.guard'
+import { RolesGuard } from '../../auth/guards/roles.guard'
+import { Roles } from '../../auth/decorators/roles.decorator'
+import { Role } from '../../auth/enums/role.enum'
 /**
  * REST controller for tenant-scoped user management.
  *
@@ -16,6 +19,7 @@ export class UserController {
     constructor(private readonly users: UserService) { }
 
     @Post()
+    @Roles(Role.TENANT_ADMIN)
     async create(
         @Param('tenantId') tenantId: string,
         @Body() dto: CreateUserDto,
@@ -24,6 +28,7 @@ export class UserController {
     }
 
     @Get()
+    @Roles(Role.TENANT_ADMIN)
     async findAll(
         @Param('tenantId') tenantId: string,
     ) {
@@ -31,6 +36,7 @@ export class UserController {
     }
 
     @Get(':id')
+    @Roles(Role.TENANT_ADMIN)
     async findOne(
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,
@@ -39,6 +45,7 @@ export class UserController {
     }
 
     @Patch(':id')
+    @Roles(Role.TENANT_ADMIN)
     async update(
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,
@@ -48,10 +55,12 @@ export class UserController {
     }
 
     @Delete(':id')
+    @Roles(Role.TENANT_ADMIN)
     async remove(
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,
     ) {
         return this.users.deleteUser(tenantId, id)
     }
+
 }
