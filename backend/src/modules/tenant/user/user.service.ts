@@ -5,6 +5,7 @@ import { TenantRepository } from 'src/public/db/tenant.repository'
 import { USER_MODEL_NAME, UserDocument } from './user.schema'
 import { CreateUserDto } from './dto/create-user'
 import { UpdateUserDto } from './dto/update-user'
+import { Role } from '../../auth/enums/role.enum'
 
 /**
  * Service for managing users within a **specific tenant's database**.
@@ -22,7 +23,7 @@ export class UserService extends TenantRepository<UserDocument> {
     }
 
     async createUser(tenantId: string, data: CreateUserDto) {
-        const user = await this.createDocument(data, tenantId)
+        const user = await this.createDocument({...data, roles: [Role.USER],}, tenantId)
         return this.toPublicUser(user)
     }
 
@@ -36,6 +37,7 @@ export class UserService extends TenantRepository<UserDocument> {
             id: user._id,
             email: user.email,
             name: user.name,
+            roles: user.roles,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
         }
