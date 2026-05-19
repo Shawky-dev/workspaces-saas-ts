@@ -12,6 +12,11 @@ import { UserService } from './user.service'
 
 import { CreateUserDto } from './dto/create-user'
 import { UpdateUserDto } from './dto/update-user'
+import { UseGuards } from '@nestjs/common'
+import { CommonAuthGuard } from '../../auth/guards/common-auth.guard'
+import { RolesGuard } from '../../auth/guards/roles.guard'
+import { Roles } from '../../auth/decorators/roles.decorator'
+import { Role } from '../../auth/enums/role.enum'
 
 /**
  * REST controller for platform-level user management.
@@ -29,6 +34,7 @@ export class UserController {
     ) { }
 
     @Post()
+    @Roles(Role.SUPER_ADMIN)
     async create(
         @Body() dto: CreateUserDto,
     ) {
@@ -36,11 +42,13 @@ export class UserController {
     }
 
     @Get()
+    @Roles(Role.SUPER_ADMIN)
     async findAll() {
         return this.users.findAllUsers()
     }
 
     @Get(':id')
+    @Roles(Role.SUPER_ADMIN)
     async findOne(
         @Param('id') id: string,
     ) {
@@ -48,6 +56,7 @@ export class UserController {
     }
 
     @Patch(':id')
+    @Roles(Role.SUPER_ADMIN)
     async update(
         @Param('id') id: string,
         @Body() dto: UpdateUserDto,
@@ -56,6 +65,7 @@ export class UserController {
     }
 
     @Delete(':id')
+    @Roles(Role.SUPER_ADMIN)
     async remove(
         @Param('id') id: string,
     ) {
