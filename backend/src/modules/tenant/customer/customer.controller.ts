@@ -9,30 +9,38 @@ import {
     UseGuards,
 } from '@nestjs/common'
 
-import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
-import { RoomService } from './room.service'
+import { CustomerService } from './customer.service'
 
-import { CreateRoomDto } from './dto/create-room.dto'
-import { UpdateRoomDto } from './dto/update-room.dto'
+import { CreateCustomerDto } from './dto/create-customer.dto'
+import { UpdateCustomerDto } from './dto/update-customer.dto'
+import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
+
 
 @UseGuards(TenantAuthGuard)
-@Controller(':tenantId/rooms')
-export class RoomController {
-    constructor(private readonly roomService: RoomService) {}
+@Controller(':tenantId/customers')
+export class CustomerController {
+    constructor(
+        private readonly customerService: CustomerService,
+    ) {}
 
     @Post()
     async create(
         @Param('tenantId') tenantId: string,
-        @Body() dto: CreateRoomDto,
+        @Body() dto: CreateCustomerDto,
     ) {
-        return this.roomService.createRoom(tenantId, dto)
+        return this.customerService.createCustomer(
+            tenantId,
+            dto,
+        )
     }
 
     @Get()
     async findAll(
         @Param('tenantId') tenantId: string,
     ) {
-        return this.roomService.findAllRooms(tenantId)
+        return this.customerService.findAllCustomers(
+            tenantId,
+        )
     }
 
     @Get(':id')
@@ -40,16 +48,19 @@ export class RoomController {
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,
     ) {
-        return this.roomService.findRoomById(tenantId, id)
+        return this.customerService.findCustomerById(
+            tenantId,
+            id,
+        )
     }
 
     @Patch(':id')
     async update(
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,
-        @Body() dto: UpdateRoomDto,
+        @Body() dto: UpdateCustomerDto,
     ) {
-        return this.roomService.updateRoom(
+        return this.customerService.updateCustomer(
             tenantId,
             id,
             dto,
@@ -61,7 +72,7 @@ export class RoomController {
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,
     ) {
-        return this.roomService.deleteRoom(
+        return this.customerService.deleteCustomer(
             tenantId,
             id,
         )

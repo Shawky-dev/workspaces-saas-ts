@@ -220,3 +220,92 @@ export function adjustCatalogQuantity(
     token,
   })
 }
+
+export function listRooms(
+  tenantId: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms`, {
+    token,
+  })
+}
+
+export function createRoom(
+  tenantId: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function updateRoom(
+  tenantId: string,
+  id: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function deleteRoom(
+  tenantId: string,
+  id: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/rooms/${id}`, {
+    method: 'DELETE',
+    token,
+  })
+}
+export function listCustomers(
+  tenantId: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers`, {
+    token,
+  })
+}
+
+export function createCustomer(
+  tenantId: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function updateCustomer(
+  tenantId: string,
+  id: string,
+  payload: any,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function deleteCustomer(
+  tenantId: string,
+  id: string,
+  token?: string | null,
+) {
+  return apiRequest(`/${tenantId}/customers/${id}`, {
+    method: 'DELETE',
+    token,
+  })
+}

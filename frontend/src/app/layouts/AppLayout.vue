@@ -40,6 +40,16 @@ const navItems = computed(() => {
         to: `/${session.value.tenantId}/users`,
         icon: Users,
       },
+      {
+  label: 'Rooms',
+  to: `/${session.value.tenantId}/rooms`,
+  icon: Building2,
+},
+{
+  label: 'Customers',
+  to: `/${session.value.tenantId}/customers`,
+  icon: Users,
+},
     ]
   }
 

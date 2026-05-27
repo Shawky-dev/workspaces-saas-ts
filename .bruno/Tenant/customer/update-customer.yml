@@ -1,0 +1,27 @@
+info:
+  name: update-customer
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{URL}}/{{tenantId}}/customers/{{customerId}}"
+  body:
+    type: json
+    data: |-
+      {
+        "notes":"Updated customer note",
+        "isBlocked":true
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: customerId
+      value: 6a0b9109506df94d303b34a0
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
