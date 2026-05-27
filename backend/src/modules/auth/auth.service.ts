@@ -77,13 +77,14 @@ export class AuthService {
      * @returns The signed JWT and a public user payload.
      */
     async loginCommon(user: any) {
-        const payload = { sub: user._id, email: user.email, type: 'common' }
+        const payload = { sub: user._id, email: user.email, type: 'common', roles: user.roles, }
         return {
             access_token: this.jwtService.sign(payload),
             user: {
                 id: user._id,
                 email: user.email,
                 name: user.name,
+                roles: user.roles,
             },
         }
     }
@@ -103,7 +104,8 @@ export class AuthService {
             sub: user._id,
             email: user.email,
             type: 'tenant',
-            tenantId
+            tenantId,
+            roles: user.roles,
         }
         return {
             access_token: this.jwtService.sign(payload),
@@ -111,6 +113,7 @@ export class AuthService {
                 id: user._id,
                 email: user.email,
                 name: user.name,
+                roles: user.roles,
             },
         }
     }
