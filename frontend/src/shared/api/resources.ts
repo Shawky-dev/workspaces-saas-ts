@@ -3,12 +3,19 @@ import type {
   AuthResponse,
   BulkUpdateCatalogQuantityItem,
   CatalogItem,
+  CloseSessionPayload,
   CreateCatalogItemPayload,
   CreateTenantPayload,
   CreateUserPayload,
+  Customer,
   MeResponse,
+  Receipt,
+  RoomAvailability,
+  Session,
+  StartSessionPayload,
   Tenant,
   UpdateCatalogItemPayload,
+  UpdateSessionProductsPayload,
   UpdateTenantPayload,
   UpdateUserPayload,
   User,
@@ -269,7 +276,7 @@ export function listCustomers(
   tenantId: string,
   token?: string | null,
 ) {
-  return apiRequest(`/${tenantId}/customers`, {
+  return apiRequest<Customer[]>(`/${tenantId}/customers`, {
     token,
   })
 }
@@ -308,4 +315,70 @@ export function deleteCustomer(
     method: 'DELETE',
     token,
   })
+}
+
+export function listActiveSessions(tenantId: string, token?: string | null) {
+  return apiRequest<Session[]>(`/${tenantId}/sessions/active`, { token })
+}
+
+export function getSessionAvailability(tenantId: string, token?: string | null) {
+  return apiRequest<RoomAvailability[]>(`/${tenantId}/sessions/availability`, { token })
+}
+
+export function startSession(
+  tenantId: string,
+  payload: StartSessionPayload,
+  token?: string | null,
+) {
+  return apiRequest<Session>(`/${tenantId}/sessions`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function getSession(tenantId: string, id: string, token?: string | null) {
+  return apiRequest<Session>(`/${tenantId}/sessions/${id}`, { token })
+}
+
+export function updateSessionProducts(
+  tenantId: string,
+  id: string,
+  payload: UpdateSessionProductsPayload,
+  token?: string | null,
+) {
+  return apiRequest<Session>(`/${tenantId}/sessions/${id}/products`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function closeSession(
+  tenantId: string,
+  id: string,
+  payload: CloseSessionPayload,
+  token?: string | null,
+) {
+  return apiRequest<Session>(`/${tenantId}/sessions/${id}/close`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function listReceipts(tenantId: string, token?: string | null) {
+  return apiRequest<Receipt[]>(`/${tenantId}/receipts`, { token })
+}
+
+export function getReceipt(tenantId: string, id: string, token?: string | null) {
+  return apiRequest<Receipt>(`/${tenantId}/receipts/${id}`, { token })
+}
+
+export function listCustomerReceipts(
+  tenantId: string,
+  customerId: string,
+  token?: string | null,
+) {
+  return apiRequest<Receipt[]>(`/${tenantId}/customers/${customerId}/receipts`, { token })
 }

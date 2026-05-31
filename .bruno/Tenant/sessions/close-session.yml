@@ -1,0 +1,23 @@
+info:
+  name: close-session
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{URL}}/{{tenantId}}/sessions/{{sessionId}}/close"
+  body:
+    type: json
+    data: |-
+      {
+        "discount": 0,
+        "paymentStatus": "paid",
+        "paymentMethod": "cash"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

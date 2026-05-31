@@ -93,3 +93,115 @@ export interface BulkUpdateCatalogQuantityItem {
   id: string
   quantityOnHand: number
 }
+
+export type RoomType = 'private' | 'public'
+export type SessionStatus = 'active' | 'closed'
+export type PaymentStatus = 'paid' | 'unpaid' | 'partial'
+export type PaymentMethod = 'cash' | 'card' | 'wallet' | 'bank_transfer' | 'mixed' | 'other'
+
+export interface Customer {
+  _id: string
+  firstName: string
+  lastName: string
+  phoneNumber: string
+  email?: string
+  notes?: string
+  isBlocked?: boolean
+}
+
+export interface RoomAvailability {
+  id: string
+  name: string
+  type: RoomType
+  ratePerHour: number
+  totalSeats: number
+  occupiedSeats: number
+  availableSeats: number
+  isAvailable: boolean
+}
+
+export interface SessionCustomerSnapshot {
+  customerId: string
+  firstName: string
+  lastName: string
+  phoneNumber: string
+  email?: string
+}
+
+export interface SessionRoomBooking {
+  roomId: string
+  roomName: string
+  type: RoomType
+  ratePerHour: number
+  seatCount: number
+}
+
+export interface SessionProductLine {
+  catalogItemId: string
+  name: string
+  unitPrice: number
+  quantity: number
+}
+
+export interface SessionReceiptTotals {
+  billableMinutes: number
+  roomSubtotal: number
+  productsSubtotal: number
+  discount: number
+  total: number
+  paymentStatus: PaymentStatus
+  paymentMethod: PaymentMethod
+  roomBookings: SessionRoomBooking[]
+  productLines: SessionProductLine[]
+}
+
+export interface Session {
+  id: string
+  status: SessionStatus
+  customer: SessionCustomerSnapshot
+  roomBookings: SessionRoomBooking[]
+  productLines: SessionProductLine[]
+  startedAt: string
+  closedAt?: string
+  receipt?: SessionReceiptTotals
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface Receipt {
+  id: string
+  sessionId: string
+  customer: SessionCustomerSnapshot
+  startedAt: string
+  closedAt?: string
+  receipt: SessionReceiptTotals
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface StartSessionPayload {
+  customerId?: string
+  customer?: {
+    firstName: string
+    lastName: string
+    phoneNumber: string
+    email?: string
+  }
+  roomBookings: Array<{
+    roomId: string
+    seatCount?: number
+  }>
+}
+
+export interface UpdateSessionProductsPayload {
+  products: Array<{
+    catalogItemId: string
+    quantity: number
+  }>
+}
+
+export interface CloseSessionPayload {
+  discount?: number
+  paymentStatus: PaymentStatus
+  paymentMethod: PaymentMethod
+}

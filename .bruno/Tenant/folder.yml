@@ -10,3 +10,13 @@ request:
       value: tenant-1
     - name: catalogItemId
       value: ""
+    - name: customerId
+      value: ""
+    - name: sessionId
+      value: ""
+    - name: receiptId
+      value: ""
+    - name: privateRoomId
+      value: ""
+    - name: publicRoomId
+      value: ""

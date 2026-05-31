@@ -2,10 +2,12 @@
 import {
   Building2,
   Boxes,
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   MoonStar,
   Package,
+  ReceiptText,
   SunMedium,
   Users,
 } from 'lucide-vue-next'
@@ -26,6 +28,11 @@ const navItems = computed(() => {
   if (session.value?.type === 'tenant' && session.value.tenantId) {
     return [
       {
+        label: 'Sessions',
+        to: `/${session.value.tenantId}/sessions`,
+        icon: ClipboardList,
+      },
+      {
         label: 'Catalog',
         to: `/${session.value.tenantId}/catalog`,
         icon: Package,
@@ -41,15 +48,20 @@ const navItems = computed(() => {
         icon: Users,
       },
       {
-  label: 'Rooms',
-  to: `/${session.value.tenantId}/rooms`,
-  icon: Building2,
-},
-{
-  label: 'Customers',
-  to: `/${session.value.tenantId}/customers`,
-  icon: Users,
-},
+        label: 'Rooms',
+        to: `/${session.value.tenantId}/rooms`,
+        icon: Building2,
+      },
+      {
+        label: 'Customers',
+        to: `/${session.value.tenantId}/customers`,
+        icon: Users,
+      },
+      {
+        label: 'Receipts',
+        to: `/${session.value.tenantId}/receipts`,
+        icon: ReceiptText,
+      },
     ]
   }
 

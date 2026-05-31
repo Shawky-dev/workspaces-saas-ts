@@ -10,6 +10,8 @@ import CatalogView from '@/features/catalog/views/CatalogView.vue'
 import InventoryView from '@/features/inventory/views/InventoryView.vue'
 import RoomsView from '@/features/rooms/views/RoomsView.vue'
 import CustomersView from '@/features/customers/views/CustomersView.vue'
+import SessionsView from '@/features/sessions/views/SessionsView.vue'
+import ReceiptsView from '@/features/receipts/views/ReceiptsView.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -29,7 +31,7 @@ export const router = createRouter({
         }
 
         if (session.value?.type === 'tenant' && session.value.tenantId) {
-          return { name: 'tenant-catalog', params: { tenantSlug: session.value.tenantId } }
+          return { name: 'tenant-sessions', params: { tenantSlug: session.value.tenantId } }
         }
 
         return { name: 'login' }
@@ -63,6 +65,12 @@ export const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
+          path: 'sessions',
+          name: 'tenant-sessions',
+          component: SessionsView,
+          meta: { authType: 'tenant' },
+        },
+        {
           path: 'users',
           name: 'tenant-users',
           component: TenantUsersView,
@@ -86,11 +94,17 @@ export const router = createRouter({
           meta: { authType: 'tenant' },
         },
         {
-  path: 'customers',
-  name: 'tenant-customers',
-  component: CustomersView,
-  meta: { authType: 'tenant' },
-},
+          path: 'customers',
+          name: 'tenant-customers',
+          component: CustomersView,
+          meta: { authType: 'tenant' },
+        },
+        {
+          path: 'receipts',
+          name: 'tenant-receipts',
+          component: ReceiptsView,
+          meta: { authType: 'tenant' },
+        },
       ],
     },
   ],
@@ -101,7 +115,7 @@ router.beforeEach((to) => {
 
   if (to.name === 'login' && isAuthenticated.value) {
     if (session.value?.type === 'tenant' && session.value.tenantId) {
-      return { name: 'tenant-catalog', params: { tenantSlug: session.value.tenantId } }
+      return { name: 'tenant-sessions', params: { tenantSlug: session.value.tenantId } }
     }
 
     return { name: 'dashboard' }
@@ -113,7 +127,7 @@ router.beforeEach((to) => {
 
   if (to.meta.authType && session.value?.type !== to.meta.authType) {
     if (session.value?.type === 'tenant' && session.value.tenantId) {
-      return { name: 'tenant-catalog', params: { tenantSlug: session.value.tenantId } }
+      return { name: 'tenant-sessions', params: { tenantSlug: session.value.tenantId } }
     }
 
     if (session.value?.type === 'common') {
@@ -124,7 +138,7 @@ router.beforeEach((to) => {
   }
 
   if (
-    (to.name === 'tenant-users' || to.name === 'tenant-catalog' || to.name === 'tenant-inventory'|| to.name === 'tenant-rooms' || to.name === 'tenant-customers')
+    (to.name === 'tenant-users' || to.name === 'tenant-catalog' || to.name === 'tenant-inventory' || to.name === 'tenant-rooms' || to.name === 'tenant-customers' || to.name === 'tenant-sessions' || to.name === 'tenant-receipts')
     && session.value?.type === 'tenant'
   ) {
     const tenantSlug = Array.isArray(to.params.tenantSlug)
