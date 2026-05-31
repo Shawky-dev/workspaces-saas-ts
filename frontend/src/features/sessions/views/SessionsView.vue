@@ -87,8 +87,10 @@ const isSaving = ref(false)
 const isStartOpen = ref(false)
 const isSessionOpen = ref(false)
 const isCloseOpen = ref(false)
+const isProductConfirmOpen = ref(false)
 const errorMessage = ref('')
 const formError = ref('')
+const productSuccessMessage = ref('')
 const now = ref(Date.now())
 let timer: number | undefined
 
@@ -112,6 +114,14 @@ const closeForm = reactive({
 const privateRooms = computed(() => availability.value.filter(room => room.type === 'private'))
 const publicRooms = computed(() => availability.value.filter(room => room.type === 'public'))
 const hasAvailableResources = computed(() => availability.value.some(room => room.availableSeats > 0))
+const selectedProductLines = computed(() => {
+  return catalogItems.value
+    .map((item) => ({
+      item,
+      quantity: productQuantities.value[item.id] || 0,
+    }))
+    .filter(line => line.quantity > 0)
+})
 
 function customerName(customer: Session['customer']) {
   return `${customer.firstName} ${customer.lastName}`.trim()
@@ -180,6 +190,8 @@ function openSessionDetails(currentSession: Session) {
   productQuantities.value = Object.fromEntries(
     currentSession.productLines.map(line => [line.catalogItemId, line.quantity]),
   )
+  formError.value = ''
+  productSuccessMessage.value = ''
   isSessionOpen.value = true
 }
 
@@ -290,9 +302,14 @@ async function submitStartSession() {
 }
 
 function setProductQuantity(item: CatalogItem, nextQuantity: number) {
+  const limitedQuantity = Math.min(
+    item.quantityOnHand,
+    Math.max(0, Math.floor(nextQuantity || 0)),
+  )
+
   productQuantities.value = {
     ...productQuantities.value,
-    [item.id]: Math.max(0, Math.floor(nextQuantity || 0)),
+    [item.id]: limitedQuantity,
   }
 }
 
@@ -303,6 +320,7 @@ async function saveProducts() {
 
   isSaving.value = true
   formError.value = ''
+  productSuccessMessage.value = ''
 
   const products = Object.entries(productQuantities.value)
     .filter(([, quantity]) => quantity > 0)
@@ -320,6 +338,8 @@ async function saveProducts() {
     )
     selectedSession.value = updated
     await loadData()
+    productSuccessMessage.value = 'Products were added to this session bill.'
+    isProductConfirmOpen.value = true
   } catch (error) {
     formError.value = error instanceof Error ? error.message : 'Could not save products'
   } finally {
@@ -455,6 +475,23 @@ onBeforeUnmount(() => {
                 <div class="flex justify-between">
                   <span class="text-muted-foreground">Billable</span>
                   <span>{{ formatMinutes(billableMinutes(currentSession.startedAt)) }}</span>
+                </div>
+                <div class="grid gap-1">
+                  <span class="text-muted-foreground">Products ordered</span>
+                  <div
+                    v-if="currentSession.productLines.length === 0"
+                    class="text-xs text-muted-foreground"
+                  >
+                    No products yet
+                  </div>
+                  <div
+                    v-for="line in currentSession.productLines"
+                    :key="line.catalogItemId"
+                    class="flex justify-between gap-3 text-xs"
+                  >
+                    <span>{{ line.name }} x {{ line.quantity }}</span>
+                    <span>{{ formatMoney(line.unitPrice * line.quantity) }}</span>
+                  </div>
                 </div>
                 <div class="flex justify-between">
                   <span class="text-muted-foreground">Estimated total</span>
@@ -699,6 +736,12 @@ onBeforeUnmount(() => {
           <AlertDescription>{{ formError }}</AlertDescription>
         </Alert>
 
+        <Alert v-if="productSuccessMessage">
+          <ShoppingCart class="h-4 w-4" />
+          <AlertTitle>Product bill updated</AlertTitle>
+          <AlertDescription>{{ productSuccessMessage }}</AlertDescription>
+        </Alert>
+
         <div class="overflow-hidden rounded-md border">
           <Table>
             <TableHeader>
@@ -734,12 +777,14 @@ onBeforeUnmount(() => {
                       :model-value="productQuantities[item.id] || 0"
                       type="number"
                       min="0"
+                      :max="item.quantityOnHand"
                       class="w-20"
                       @update:model-value="setProductQuantity(item, Number($event))"
                     />
                     <Button
                       variant="outline"
                       size="icon-sm"
+                      :disabled="(productQuantities[item.id] || 0) >= item.quantityOnHand"
                       @click="setProductQuantity(item, (productQuantities[item.id] || 0) + 1)"
                     >
                       <Plus class="h-4 w-4" />
@@ -749,6 +794,31 @@ onBeforeUnmount(() => {
               </TableRow>
             </TableBody>
           </Table>
+        </div>
+
+        <div class="grid gap-2 rounded-md border p-4">
+          <div class="flex items-center justify-between gap-3">
+            <h3 class="text-sm font-medium">
+              Current product bill
+            </h3>
+            <Badge variant="secondary">
+              {{ formatMoney(selectedProductLines.reduce((total, line) => total + line.item.soldPrice * line.quantity, 0)) }}
+            </Badge>
+          </div>
+          <div
+            v-if="selectedProductLines.length === 0"
+            class="text-sm text-muted-foreground"
+          >
+            No products selected.
+          </div>
+          <div
+            v-for="line in selectedProductLines"
+            :key="line.item.id"
+            class="flex items-center justify-between gap-3 text-sm"
+          >
+            <span>{{ line.item.name }} x {{ line.quantity }}</span>
+            <span>{{ formatMoney(line.item.soldPrice * line.quantity) }}</span>
+          </div>
         </div>
 
         <DialogFooter>
@@ -764,6 +834,40 @@ onBeforeUnmount(() => {
           >
             <Save class="h-4 w-4" />
             Save Products
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog v-model:open="isProductConfirmOpen">
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Products Added</DialogTitle>
+          <DialogDescription>
+            The selected products have been saved to this customer session bill.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="grid gap-2 rounded-md border p-4 text-sm">
+          <div
+            v-for="line in selectedSession?.productLines || []"
+            :key="line.catalogItemId"
+            class="flex justify-between gap-3"
+          >
+            <span>{{ line.name }} x {{ line.quantity }}</span>
+            <span>{{ formatMoney(line.unitPrice * line.quantity) }}</span>
+          </div>
+          <div
+            v-if="!selectedSession?.productLines.length"
+            class="text-muted-foreground"
+          >
+            The product bill is currently empty.
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button @click="isProductConfirmOpen = false">
+            Done
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -808,6 +912,19 @@ onBeforeUnmount(() => {
             <div class="flex justify-between">
               <span class="text-muted-foreground">Products</span>
               <span>{{ formatMoney(sessionProductSubtotal(closingSession)) }}</span>
+            </div>
+            <div
+              v-if="closingSession.productLines.length > 0"
+              class="grid gap-1 border-t pt-2"
+            >
+              <div
+                v-for="line in closingSession.productLines"
+                :key="line.catalogItemId"
+                class="flex justify-between text-xs"
+              >
+                <span>{{ line.name }} x {{ line.quantity }}</span>
+                <span>{{ formatMoney(line.unitPrice * line.quantity) }}</span>
+              </div>
             </div>
           </div>
 

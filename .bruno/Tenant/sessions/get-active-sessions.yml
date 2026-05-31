@@ -6,7 +6,9 @@ info:
 http:
   method: GET
   url: "{{URL}}/{{tenantId}}/sessions/active"
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true

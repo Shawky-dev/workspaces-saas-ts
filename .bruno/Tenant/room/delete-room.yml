@@ -6,7 +6,9 @@ info:
 http:
   method: DELETE
   url: "{{URL}}/{{tenantId}}/rooms/{{roomId}}"
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true

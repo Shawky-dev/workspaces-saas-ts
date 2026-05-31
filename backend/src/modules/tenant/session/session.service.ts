@@ -333,6 +333,10 @@ export class SessionService extends TenantRepository<SessionDocument> {
         return requestedProducts.map((requested) => {
             const product: any = productsById.get(requested.catalogItemId)
 
+            if ((product.quantityOnHand ?? 0) < requested.quantity) {
+                throw new BadRequestException(`${product.name} only has ${product.quantityOnHand ?? 0} in stock`)
+            }
+
             return {
                 catalogItemId: requested.catalogItemId,
                 name: product.name,
@@ -386,7 +390,7 @@ export class SessionService extends TenantRepository<SessionDocument> {
     private calculateBillableMinutes(startedAt: Date, closedAt: Date) {
         const durationMinutes = Math.max(
             0,
-            Math.ceil((closedAt.getTime() - new Date(startedAt).getTime()) / 60000),
+            Math.floor((closedAt.getTime() - new Date(startedAt).getTime()) / 60000),
         )
         const billableMinutes =
             Math.floor(durationMinutes / BILLING_BLOCK_MINUTES) * BILLING_BLOCK_MINUTES

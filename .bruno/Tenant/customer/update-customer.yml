@@ -13,7 +13,9 @@ http:
         "notes":"Updated customer note",
         "isBlocked":true
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 runtime:
   variables:

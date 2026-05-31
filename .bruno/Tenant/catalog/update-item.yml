@@ -6,28 +6,9 @@ info:
 http:
   method: PATCH
   url: "{{URL}}/{{tenantId}}/catalog/items/{{catalogItemId}}"
-  body:
-    type: multipartForm
-    multipartForm:
-      - name: name
-        value: Coffee
-        type: text
-      - name: purchasePrice
-        value: "22"
-        type: text
-      - name: soldPrice
-        value: "38"
-        type: text
-      - name: description
-        value: Updated workspace snack item
-        type: text
-      - name: quantityOnHand
-        value: "30"
-        type: text
-      - name: image
-        value: ""
-        type: file
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true

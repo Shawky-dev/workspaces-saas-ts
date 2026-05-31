@@ -12,7 +12,9 @@ http:
       {
         "delta": -2
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true

@@ -14,7 +14,9 @@ http:
         "paymentStatus": "paid",
         "paymentMethod": "cash"
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true
