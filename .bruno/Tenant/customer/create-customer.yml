@@ -16,7 +16,9 @@ http:
         "email":"john@example.com",
         "notes":"VIP customer"
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true

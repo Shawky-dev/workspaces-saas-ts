@@ -27,7 +27,9 @@ http:
       - name: image
         value: ""
         type: file
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true

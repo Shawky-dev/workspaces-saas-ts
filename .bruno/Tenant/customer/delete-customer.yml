@@ -6,7 +6,9 @@ info:
 http:
   method: DELETE
   url: "{{URL}}/{{tenantId}}/customers/{{customerId}}"
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 runtime:
   variables:

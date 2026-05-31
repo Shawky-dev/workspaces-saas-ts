@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { AlertCircle, Pencil, Plus, Trash2 } from 'lucide-vue-next'
+import { AlertCircle, Eye, Pencil, Plus, ReceiptText, Trash2 } from 'lucide-vue-next'
 
 import {
   Alert,
@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/alert-dialog'
 
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 
 import {
   Dialog,
@@ -50,9 +51,11 @@ import { useAuth } from '@/features/auth/composables/useAuth'
 import {
   createCustomer,
   deleteCustomer,
+  listCustomerReceipts,
   listCustomers,
   updateCustomer,
 } from '@/shared/api/resources'
+import type { Receipt } from '@/shared/types/api'
 
 const route = useRoute()
 const { session } = useAuth()
@@ -70,13 +73,17 @@ const customers = ref<any[]>([])
 
 const editingCustomer = ref<any | null>(null)
 const deletingCustomer = ref<any | null>(null)
+const historyCustomer = ref<any | null>(null)
+const customerReceipts = ref<Receipt[]>([])
 
 const isLoading = ref(false)
 const isSaving = ref(false)
 const isDeleting = ref(false)
+const isHistoryLoading = ref(false)
 
 const isDialogOpen = ref(false)
 const isDeleteOpen = ref(false)
+const isHistoryOpen = ref(false)
 
 const errorMessage = ref('')
 const formError = ref('')
@@ -88,6 +95,24 @@ const form = reactive({
   email: '',
   notes: '',
 })
+
+function formatMoney(value: number) {
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: 'USD',
+  }).format(value || 0)
+}
+
+function formatDate(value?: string) {
+  if (!value) {
+    return '-'
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
 
 async function loadCustomers() {
   if (!tenantId.value) {
@@ -219,6 +244,30 @@ function openDelete(customer: any) {
   isDeleteOpen.value = true
 }
 
+async function openHistory(customer: any) {
+  historyCustomer.value = customer
+  customerReceipts.value = []
+  isHistoryOpen.value = true
+  isHistoryLoading.value = true
+
+  try {
+    customerReceipts.value = await listCustomerReceipts(
+      tenantId.value,
+      customer._id,
+      session.value?.accessToken,
+    )
+  }
+  catch (error) {
+    errorMessage.value =
+      error instanceof Error
+        ? error.message
+        : 'Could not load customer history'
+  }
+  finally {
+    isHistoryLoading.value = false
+  }
+}
+
 async function confirmDelete() {
   if (!deletingCustomer.value) {
     return
@@ -299,7 +348,7 @@ watch(tenantId, () => {
             <TableHead>Phone</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Notes</TableHead>
-            <TableHead class="w-32 text-right">
+            <TableHead class="w-44 text-right">
               Actions
             </TableHead>
           </TableRow>
@@ -342,6 +391,16 @@ watch(tenantId, () => {
                   <Button
                     variant="outline"
                     size="icon-sm"
+                    aria-label="View customer history"
+                    @click="openHistory(customer)"
+                  >
+                    <Eye class="h-4 w-4" />
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    aria-label="Edit customer"
                     @click="openEdit(customer)"
                   >
                     <Pencil class="h-4 w-4" />
@@ -350,6 +409,7 @@ watch(tenantId, () => {
                   <Button
                     variant="destructive"
                     size="icon-sm"
+                    aria-label="Delete customer"
                     @click="openDelete(customer)"
                   >
                     <Trash2 class="h-4 w-4" />
@@ -475,5 +535,126 @@ watch(tenantId, () => {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
+
+    <Dialog v-model:open="isHistoryOpen">
+      <DialogContent class="sm:max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>
+            Customer History
+          </DialogTitle>
+
+          <DialogDescription>
+            Past receipts for {{ historyCustomer?.firstName }} {{ historyCustomer?.lastName }}.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="grid gap-4">
+          <div class="rounded-md border p-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="font-medium">
+                  {{ historyCustomer?.firstName }} {{ historyCustomer?.lastName }}
+                </div>
+                <div class="text-sm text-muted-foreground">
+                  {{ historyCustomer?.phoneNumber }} · {{ historyCustomer?.email || 'No email' }}
+                </div>
+              </div>
+              <Badge variant="secondary">
+                {{ customerReceipts.length }} receipts
+              </Badge>
+            </div>
+          </div>
+
+          <div class="overflow-hidden rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Rooms</TableHead>
+                  <TableHead>Products</TableHead>
+                  <TableHead>Discount</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead>Payment</TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                <TableRow v-if="isHistoryLoading">
+                  <TableCell colspan="6">
+                    Loading history...
+                  </TableCell>
+                </TableRow>
+
+                <template v-else>
+                  <TableRow
+                    v-for="receipt in customerReceipts"
+                    :key="receipt.id"
+                  >
+                    <TableCell>{{ formatDate(receipt.closedAt) }}</TableCell>
+                    <TableCell>{{ formatMoney(receipt.receipt.roomSubtotal) }}</TableCell>
+                    <TableCell>
+                      <div class="grid gap-1">
+                        <span>{{ formatMoney(receipt.receipt.productsSubtotal) }}</span>
+                        <span class="text-xs text-muted-foreground">
+                          {{ receipt.receipt.productLines.length }} product lines
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{{ formatMoney(receipt.receipt.discount) }}</TableCell>
+                    <TableCell class="font-medium">
+                      {{ formatMoney(receipt.receipt.total) }}
+                    </TableCell>
+                    <TableCell>
+                      <div class="flex flex-wrap gap-1">
+                        <Badge>{{ receipt.receipt.paymentStatus }}</Badge>
+                        <Badge variant="secondary">
+                          {{ receipt.receipt.paymentMethod }}
+                        </Badge>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </template>
+
+                <TableRow v-if="!isHistoryLoading && customerReceipts.length === 0">
+                  <TableCell
+                    colspan="6"
+                    class="text-muted-foreground"
+                  >
+                    No receipt history for this customer.
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+
+          <div
+            v-for="receipt in customerReceipts"
+            :key="`detail-${receipt.id}`"
+            class="grid gap-2 rounded-md border p-4 text-sm"
+          >
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 font-medium">
+                <ReceiptText class="h-4 w-4" />
+                {{ formatDate(receipt.closedAt) }}
+              </div>
+              <span>{{ formatMoney(receipt.receipt.total) }}</span>
+            </div>
+            <div
+              v-if="receipt.receipt.productLines.length > 0"
+              class="grid gap-1 text-muted-foreground"
+            >
+              <div
+                v-for="line in receipt.receipt.productLines"
+                :key="line.catalogItemId"
+                class="flex justify-between gap-3"
+              >
+                <span>{{ line.name }} x {{ line.quantity }}</span>
+                <span>{{ formatMoney(line.unitPrice * line.quantity) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   </section>
 </template>

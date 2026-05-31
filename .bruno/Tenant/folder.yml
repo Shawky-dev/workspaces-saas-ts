@@ -4,9 +4,27 @@ info:
   seq: 2
 
 request:
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
   variables:
     - name: tenantId
       value: tenant-1
     - name: catalogItemId
       value: ""
+    - name: customerId
+      value: ""
+    - name: sessionId
+      value: ""
+    - name: receiptId
+      value: ""
+    - name: privateRoomId
+      value: ""
+    - name: publicRoomId
+      value: ""
+    - name: reservationId
+      value: ""
+    - name: weekStart
+      value: "2026-06-01"
+    - name: JWT
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTFjNTU4N2IzY2VlODlkZmFiODRjMGIiLCJlbWFpbCI6IjFAMS5jb20iLCJ0eXBlIjoidGVuYW50IiwidGVuYW50SWQiOiJ0ZW5hbnQtMSIsImlhdCI6MTc4MDI0MzE0MywiZXhwIjoxNzgwMjQ2NzQzfQ.XmPO_yiwQN5QF0ROvb_k9dw61-bMah0FW3mCuVpGtpE

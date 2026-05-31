@@ -1,0 +1,33 @@
+info:
+  name: update-reservation-settings
+  type: http
+  seq: 2
+
+http:
+  method: PUT
+  url: "{{URL}}/{{tenantId}}/reservation-settings"
+  body:
+    type: json
+    data: |-
+      {
+        "timezone": "Africa/Cairo",
+        "slotMinutes": 30,
+        "weeklyHours": [
+          { "dayOfWeek": 0, "enabled": false, "opensAt": "09:00", "closesAt": "17:00" },
+          { "dayOfWeek": 1, "enabled": true, "opensAt": "09:00", "closesAt": "17:00" },
+          { "dayOfWeek": 2, "enabled": true, "opensAt": "09:00", "closesAt": "17:00" },
+          { "dayOfWeek": 3, "enabled": true, "opensAt": "09:00", "closesAt": "17:00" },
+          { "dayOfWeek": 4, "enabled": true, "opensAt": "09:00", "closesAt": "17:00" },
+          { "dayOfWeek": 5, "enabled": true, "opensAt": "09:00", "closesAt": "17:00" },
+          { "dayOfWeek": 6, "enabled": false, "opensAt": "09:00", "closesAt": "17:00" }
+        ]
+      }
+  auth:
+    type: bearer
+    token: "{{JWT}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

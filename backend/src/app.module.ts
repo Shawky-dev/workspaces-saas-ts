@@ -13,6 +13,8 @@ import { AuthModule } from './modules/auth/auth.module'
 import { CatalogModule } from './modules/tenant/catalog/catalog.module'
 import { RoomModule } from './modules/tenant/room/room.module'
 import { CustomerModule } from './modules/tenant/customer/customer.module'
+import { SessionModule } from './modules/tenant/session/session.module'
+import { ReservationModule } from './modules/tenant/reservation/reservation.module'
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { CustomerModule } from './modules/tenant/customer/customer.module'
     CatalogModule,
     RoomModule,
     CustomerModule,
+    SessionModule,
+    ReservationModule,
   ],
 })
 export class AppModule { }

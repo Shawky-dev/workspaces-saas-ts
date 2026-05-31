@@ -1,0 +1,28 @@
+info:
+  name: update-session-products
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{URL}}/{{tenantId}}/sessions/{{sessionId}}/products"
+  body:
+    type: json
+    data: |-
+      {
+        "products": [
+          {
+            "catalogItemId": "{{catalogItemId}}",
+            "quantity": 2
+          }
+        ]
+      }
+  auth:
+    type: bearer
+    token: "{{JWT}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

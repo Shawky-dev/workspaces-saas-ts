@@ -15,7 +15,9 @@ http:
         "ratePerHour":25,
         "seats":10
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: "{{JWT}}"
 
 settings:
   encodeUrl: true

@@ -1,0 +1,9 @@
+info:
+  name: receipts
+  type: folder
+  seq: 7
+
+request:
+  auth:
+    type: bearer
+    token: "{{JWT}}"
