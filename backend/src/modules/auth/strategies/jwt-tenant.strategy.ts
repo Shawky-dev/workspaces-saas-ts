@@ -48,6 +48,7 @@ export class JwtTenantStrategy extends PassportStrategy(Strategy, 'jwt-tenant') 
             email: user.email,
             name: user.name,
             tenantId: payload.tenantId,
+            role: user.role,
         }
     }
 }

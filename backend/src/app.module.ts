@@ -21,6 +21,7 @@ import { ReservationModule } from './modules/tenant/reservation/reservation.modu
     //_CONFIG
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '../.env',
     }),
     TenancyModule,
     //

@@ -8,12 +8,16 @@ import {
     UseGuards,
 } from '@nestjs/common'
 import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
+import { RolesGuard } from 'src/modules/auth/guards/roles.guard'
+import { Roles } from 'src/modules/auth/decorators/roles.decorator'
+import { TenantUserRole } from '../user/role.enum'
 import { CloseSessionDto } from './dto/close-session.dto'
 import { StartSessionDto } from './dto/start-session.dto'
 import { UpdateSessionProductsDto } from './dto/update-session-products.dto'
 import { SessionService } from './session.service'
 
-@UseGuards(TenantAuthGuard)
+@UseGuards(TenantAuthGuard, RolesGuard)
+@Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.RECEPTIONIST)
 @Controller(':tenantId')
 export class SessionController {
     constructor(private readonly sessions: SessionService) { }

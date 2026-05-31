@@ -7,6 +7,7 @@ import { TENANT_MODEL_NAME, TenantDocument } from './tenant.schema'
 import { CreateTenantDto } from './dto/create-tenant'
 import { TenantBootstrapService } from './bootstrap/bootstrap.service'
 import { CreateUserDto } from 'src/modules/tenant/user/dto/create-user'
+import { TenantUserRole } from 'src/modules/tenant/user/role.enum'
 import { CommonRepository } from 'src/public/db/common.repository'
 import { TenantBootstrapPayload } from './bootstrap/bootstrap.interface'
 import { UserBootstrapPayload } from 'src/modules/tenant/user/user.bootstrapper'
@@ -46,6 +47,7 @@ export class TenantService extends CommonRepository<TenantDocument> {
             email: dto.adminEmail,
             name: dto.adminName,
             password: dto.adminPassword,
+            role: TenantUserRole.SUPER_ADMIN,
         }
         let userPayload: UserBootstrapPayload = {
             admin: userDTO

@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Pencil, Plus, Search, Trash2 } from 'lucide-vue-next'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -27,7 +28,7 @@ import {
   listTenantUsers,
   updateTenantUser,
 } from '@/shared/api/resources'
-import type { User } from '@/shared/types/api'
+import type { TenantUserRole, User } from '@/shared/types/api'
 import { useAuth } from '@/features/auth/composables/useAuth'
 
 const { session } = useAuth()
@@ -51,6 +52,7 @@ const form = reactive({
   name: '',
   email: '',
   password: '',
+  role: 'receptionist' as TenantUserRole,
 })
 
 function resetForm() {
@@ -58,6 +60,7 @@ function resetForm() {
   form.name = ''
   form.email = ''
   form.password = ''
+  form.role = 'receptionist'
 }
 
 async function loadUsers() {
@@ -96,6 +99,7 @@ function openEdit(user: User) {
   form.name = user.name
   form.email = user.email
   form.password = ''
+  form.role = (user.role as TenantUserRole) ?? 'receptionist'
   isDialogOpen.value = true
 }
 
@@ -109,12 +113,14 @@ async function saveUser() {
         name: form.name,
         email: form.email,
         password: form.password || undefined,
+        role: form.role,
       }, session.value?.accessToken)
     } else {
       await createTenantUser(selectedTenantId.value, {
         name: form.name,
         email: form.email,
         password: form.password,
+        role: form.role,
       }, session.value?.accessToken)
     }
 
@@ -207,6 +213,7 @@ watch(routeTenantSlug, (tenantSlug) => {
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Role</TableHead>
             <TableHead class="w-32 text-right">
               Actions
             </TableHead>
@@ -215,7 +222,7 @@ watch(routeTenantSlug, (tenantSlug) => {
         <TableBody>
           <TableRow v-if="isLoading">
             <TableCell
-              colspan="3"
+              colspan="4"
               class="text-muted-foreground"
             >
               Loading tenant users...
@@ -230,6 +237,11 @@ watch(routeTenantSlug, (tenantSlug) => {
                 {{ user.name }}
               </TableCell>
               <TableCell>{{ user.email }}</TableCell>
+              <TableCell>
+                <Badge variant="outline">
+                  {{ user.role ?? '—' }}
+                </Badge>
+              </TableCell>
               <TableCell>
                 <div class="flex justify-end gap-2">
                   <Button
@@ -254,7 +266,7 @@ watch(routeTenantSlug, (tenantSlug) => {
           </template>
           <TableRow v-if="!isLoading && users.length === 0">
             <TableCell
-              colspan="3"
+              colspan="4"
               class="text-muted-foreground"
             >
               No tenant users loaded.
@@ -303,6 +315,19 @@ watch(routeTenantSlug, (tenantSlug) => {
               minlength="6"
               :required="!editingUser"
             />
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="tenant-user-role">Role</Label>
+            <select
+              id="tenant-user-role"
+              v-model="form.role"
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="super_admin">Super Admin</option>
+              <option value="receptionist">Receptionist</option>
+              <option value="supplier">Supplier</option>
+            </select>
           </div>
 
           <DialogFooter>

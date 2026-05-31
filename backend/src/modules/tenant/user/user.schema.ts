@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 import * as bcrypt from 'bcrypt'
+import { TenantUserRole } from './role.enum'
 
 /**
  * Mongoose schema for a **tenant-scoped user** stored in a workspace database.
@@ -31,6 +32,14 @@ export class User {
     /** Display name of the user within this workspace. */
     @Prop({ required: true })
     name!: string
+
+    /** Workspace role controlling which features this user can access. */
+    @Prop({
+        required: true,
+        enum: Object.values(TenantUserRole),
+        default: TenantUserRole.SUPER_ADMIN,
+    })
+    role!: TenantUserRole
 
 }
 

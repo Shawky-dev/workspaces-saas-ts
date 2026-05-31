@@ -23,16 +23,16 @@ export class Room {
     @Prop({
         required: true,
         min: 0,
-    })
+  })
     ratePerHour!: number
 
-    @Prop({
-        min: 1,
-    })
-    seats?: number
+  @Prop({
+    min: 1,
+  })
+  seats?: number;
 }
 
-export type RoomDocument = Room & Document
+export type RoomDocument = Room & Document;
 
-export const RoomSchema = SchemaFactory.createForClass(Room)
-export const ROOM_MODEL_NAME = Room.name
+export const RoomSchema = SchemaFactory.createForClass(Room);
+export const ROOM_MODEL_NAME = Room.name;
