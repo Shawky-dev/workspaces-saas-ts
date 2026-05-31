@@ -10,12 +10,16 @@ import {
 } from '@nestjs/common'
 
 import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
+import { RolesGuard } from 'src/modules/auth/guards/roles.guard'
+import { Roles } from 'src/modules/auth/decorators/roles.decorator'
+import { TenantUserRole } from '../user/role.enum'
 import { RoomService } from './room.service'
 
 import { CreateRoomDto } from './dto/create-room.dto'
 import { UpdateRoomDto } from './dto/update-room.dto'
 
-@UseGuards(TenantAuthGuard)
+@UseGuards(TenantAuthGuard, RolesGuard)
+@Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.RECEPTIONIST)
 @Controller(':tenantId/rooms')
 export class RoomController {
     constructor(private readonly roomService: RoomService) {}

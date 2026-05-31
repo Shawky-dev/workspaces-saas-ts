@@ -19,56 +19,47 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { useTheme } from '@/composables/useTheme'
 import { useAuth } from '@/features/auth/composables/useAuth'
+import type { TenantUserRole } from '@/shared/types/api'
 
 const route = useRoute()
 const router = useRouter()
 const { isDark, toggleTheme } = useTheme()
 const { logout, session } = useAuth()
 
-const navItems = computed(() => {
+interface NavItem {
+  label: string
+  to: string
+  icon: any
+  allowedRoles?: TenantUserRole[]
+}
+
+const navItems = computed<NavItem[]>(() => {
   if (session.value?.type === 'tenant' && session.value.tenantId) {
-    return [
-      {
-        label: 'Sessions',
-        to: `/${session.value.tenantId}/sessions`,
-        icon: ClipboardList,
-      },
-      {
-        label: 'Reservations',
-        to: `/${session.value.tenantId}/reservations`,
-        icon: CalendarClock,
-      },
-      {
-        label: 'Catalog',
-        to: `/${session.value.tenantId}/catalog`,
-        icon: Package,
-      },
-      {
-        label: 'Inventory',
-        to: `/${session.value.tenantId}/inventory`,
-        icon: Boxes,
-      },
-      {
-        label: 'Tenant Users',
-        to: `/${session.value.tenantId}/users`,
-        icon: Users,
-      },
-      {
-        label: 'Rooms',
-        to: `/${session.value.tenantId}/rooms`,
-        icon: Building2,
-      },
-      {
-        label: 'Customers',
-        to: `/${session.value.tenantId}/customers`,
-        icon: Users,
-      },
-      {
-        label: 'Receipts',
-        to: `/${session.value.tenantId}/receipts`,
-        icon: ReceiptText,
-      },
+    const role = session.value.user.role as TenantUserRole | undefined
+    const tenantId = session.value.tenantId
+
+    const allItems: NavItem[] = [
+      { label: 'Sessions', to: `/${tenantId}/sessions`, icon: ClipboardList,
+        allowedRoles: ['super_admin', 'receptionist'] },
+      { label: 'Reservations', to: `/${tenantId}/reservations`, icon: CalendarClock,
+        allowedRoles: ['super_admin', 'receptionist'] },
+      { label: 'Catalog', to: `/${tenantId}/catalog`, icon: Package,
+        allowedRoles: ['super_admin', 'supplier'] },
+      { label: 'Inventory', to: `/${tenantId}/inventory`, icon: Boxes,
+        allowedRoles: ['super_admin', 'supplier'] },
+      { label: 'Tenant Users', to: `/${tenantId}/users`, icon: Users,
+        allowedRoles: ['super_admin'] },
+      { label: 'Rooms', to: `/${tenantId}/rooms`, icon: Building2,
+        allowedRoles: ['super_admin', 'receptionist'] },
+      { label: 'Customers', to: `/${tenantId}/customers`, icon: Users,
+        allowedRoles: ['super_admin', 'receptionist'] },
+      { label: 'Receipts', to: `/${tenantId}/receipts`, icon: ReceiptText,
+        allowedRoles: ['super_admin', 'receptionist'] },
     ]
+
+    return role
+      ? allItems.filter(item => !item.allowedRoles || item.allowedRoles.includes(role))
+      : allItems
   }
 
   return [
@@ -142,7 +133,7 @@ function handleLogout() {
                   {{ session?.user.name }}
                 </p>
                 <Badge variant="secondary">
-                  {{ session?.type }}
+                  {{ session?.user.role ?? session?.type }}
                 </Badge>
               </div>
               <p class="truncate text-xs text-muted-foreground">

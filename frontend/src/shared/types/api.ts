@@ -1,7 +1,10 @@
+export type TenantUserRole = 'super_admin' | 'receptionist' | 'supplier'
+
 export interface User {
   id: string
   email: string
   name: string
+  role?: TenantUserRole
   createdAt?: string
   updatedAt?: string
 }
@@ -29,12 +32,14 @@ export interface CreateUserPayload {
   name: string
   email: string
   password: string
+  role?: TenantUserRole
 }
 
 export interface UpdateUserPayload {
   name?: string
   email?: string
   password?: string
+  role?: TenantUserRole
 }
 
 export interface CreateTenantPayload {

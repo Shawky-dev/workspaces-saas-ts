@@ -15,7 +15,7 @@ import {
         MongooseTenancyModule.forFeature([
             {
                 name: CUSTOMER_MODEL_NAME,
-                0schema: CustomerSchema,
+                schema: CustomerSchema,
             },
         ]),
     ],

@@ -16,6 +16,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express'
 import type { Response } from 'express'
 import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
+import { RolesGuard } from 'src/modules/auth/guards/roles.guard'
+import { Roles } from 'src/modules/auth/decorators/roles.decorator'
+import { TenantUserRole } from '../user/role.enum'
 import { CatalogService } from './catalog.service'
 import { CreateCatalogItemDto } from './dto/create-catalog-item.dto'
 import { UpdateCatalogItemDto } from './dto/update-catalog-item.dto'
@@ -49,7 +52,8 @@ const catalogImageInterceptor = FileInterceptor('image', {
     },
 })
 
-@UseGuards(TenantAuthGuard)
+@UseGuards(TenantAuthGuard, RolesGuard)
+@Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.SUPPLIER)
 @Controller(':tenantId/catalog/items')
 export class CatalogController {
     constructor(private readonly catalog: CatalogService) { }
@@ -65,6 +69,7 @@ export class CatalogController {
     }
 
     @Get()
+    @Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.SUPPLIER, TenantUserRole.RECEPTIONIST)
     async findAll(
         @Param('tenantId') tenantId: string,
     ) {
@@ -72,6 +77,7 @@ export class CatalogController {
     }
 
     @Get(':id/image')
+    @Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.SUPPLIER, TenantUserRole.RECEPTIONIST)
     async findImage(
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,
@@ -89,6 +95,7 @@ export class CatalogController {
     }
 
     @Get(':id')
+    @Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.SUPPLIER, TenantUserRole.RECEPTIONIST)
     async findOne(
         @Param('tenantId') tenantId: string,
         @Param('id') id: string,

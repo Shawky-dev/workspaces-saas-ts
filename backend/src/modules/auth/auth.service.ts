@@ -103,7 +103,8 @@ export class AuthService {
             sub: user._id,
             email: user.email,
             type: 'tenant',
-            tenantId
+            tenantId,
+            role: user.role,
         }
         return {
             access_token: this.jwtService.sign(payload),
@@ -111,6 +112,7 @@ export class AuthService {
                 id: user._id,
                 email: user.email,
                 name: user.name,
+                role: user.role,
             },
         }
     }

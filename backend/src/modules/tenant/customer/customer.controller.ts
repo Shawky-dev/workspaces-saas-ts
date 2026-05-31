@@ -14,9 +14,12 @@ import { CustomerService } from './customer.service'
 import { CreateCustomerDto } from './dto/create-customer.dto'
 import { UpdateCustomerDto } from './dto/update-customer.dto'
 import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
+import { RolesGuard } from 'src/modules/auth/guards/roles.guard'
+import { Roles } from 'src/modules/auth/decorators/roles.decorator'
+import { TenantUserRole } from '../user/role.enum'
 
-
-@UseGuards(TenantAuthGuard)
+@UseGuards(TenantAuthGuard, RolesGuard)
+@Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.RECEPTIONIST)
 @Controller(':tenantId/customers')
 export class CustomerController {
     constructor(

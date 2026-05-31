@@ -10,13 +10,17 @@ import {
     UseGuards,
 } from '@nestjs/common'
 import { TenantAuthGuard } from 'src/modules/auth/guards/tenant-auth.guard'
+import { RolesGuard } from 'src/modules/auth/guards/roles.guard'
+import { Roles } from 'src/modules/auth/decorators/roles.decorator'
+import { TenantUserRole } from '../user/role.enum'
 import { CancelReservationDto } from './dto/cancel-reservation.dto'
 import { CreateReservationDto } from './dto/create-reservation.dto'
 import { UpdateReservationDto } from './dto/update-reservation.dto'
 import { UpdateReservationSettingsDto } from './dto/update-reservation-settings.dto'
 import { ReservationService } from './reservation.service'
 
-@UseGuards(TenantAuthGuard)
+@UseGuards(TenantAuthGuard, RolesGuard)
+@Roles(TenantUserRole.SUPER_ADMIN, TenantUserRole.RECEPTIONIST)
 @Controller(':tenantId')
 export class ReservationController {
     constructor(private readonly reservations: ReservationService) { }
