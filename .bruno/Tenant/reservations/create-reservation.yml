@@ -1,0 +1,35 @@
+info:
+  name: create-reservation
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{URL}}/{{tenantId}}/reservations"
+  body:
+    type: json
+    data: |-
+      {
+        "customerId": "{{customerId}}",
+        "startsAt": "2026-06-01T10:00:00.000Z",
+        "endsAt": "2026-06-01T11:00:00.000Z",
+        "roomBookings": [
+          {
+            "roomId": "{{privateRoomId}}",
+            "seatCount": 1
+          },
+          {
+            "roomId": "{{publicRoomId}}",
+            "seatCount": 2
+          }
+        ]
+      }
+  auth:
+    type: bearer
+    token: "{{JWT}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

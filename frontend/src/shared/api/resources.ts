@@ -4,17 +4,24 @@ import type {
   BulkUpdateCatalogQuantityItem,
   CatalogItem,
   CloseSessionPayload,
+  CancelReservationPayload,
+  ConfirmArrivalResponse,
   CreateCatalogItemPayload,
+  CreateReservationPayload,
   CreateTenantPayload,
   CreateUserPayload,
   Customer,
   MeResponse,
   Receipt,
+  Reservation,
+  ReservationSettings,
+  ReservationTimetable,
   RoomAvailability,
   Session,
   StartSessionPayload,
   Tenant,
   UpdateCatalogItemPayload,
+  UpdateReservationPayload,
   UpdateSessionProductsPayload,
   UpdateTenantPayload,
   UpdateUserPayload,
@@ -381,4 +388,77 @@ export function listCustomerReceipts(
   token?: string | null,
 ) {
   return apiRequest<Receipt[]>(`/${tenantId}/customers/${customerId}/receipts`, { token })
+}
+
+export function getReservationSettings(tenantId: string, token?: string | null) {
+  return apiRequest<ReservationSettings>(`/${tenantId}/reservation-settings`, { token })
+}
+
+export function updateReservationSettings(
+  tenantId: string,
+  payload: ReservationSettings,
+  token?: string | null,
+) {
+  return apiRequest<ReservationSettings>(`/${tenantId}/reservation-settings`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function listReservations(tenantId: string, weekStart: string, token?: string | null) {
+  return apiRequest<Reservation[]>(`/${tenantId}/reservations?weekStart=${encodeURIComponent(weekStart)}`, { token })
+}
+
+export function getReservationTimetable(tenantId: string, weekStart: string, token?: string | null) {
+  return apiRequest<ReservationTimetable>(`/${tenantId}/reservations/timetable?weekStart=${encodeURIComponent(weekStart)}`, { token })
+}
+
+export function createReservation(
+  tenantId: string,
+  payload: CreateReservationPayload,
+  token?: string | null,
+) {
+  return apiRequest<Reservation>(`/${tenantId}/reservations`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function getReservation(tenantId: string, id: string, token?: string | null) {
+  return apiRequest<Reservation>(`/${tenantId}/reservations/${id}`, { token })
+}
+
+export function updateReservation(
+  tenantId: string,
+  id: string,
+  payload: UpdateReservationPayload,
+  token?: string | null,
+) {
+  return apiRequest<Reservation>(`/${tenantId}/reservations/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function cancelReservation(
+  tenantId: string,
+  id: string,
+  payload: CancelReservationPayload,
+  token?: string | null,
+) {
+  return apiRequest<Reservation>(`/${tenantId}/reservations/${id}/cancel`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    token,
+  })
+}
+
+export function confirmReservationArrival(tenantId: string, id: string, token?: string | null) {
+  return apiRequest<ConfirmArrivalResponse>(`/${tenantId}/reservations/${id}/confirm-arrival`, {
+    method: 'POST',
+    token,
+  })
 }

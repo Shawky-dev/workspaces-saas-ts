@@ -1,0 +1,30 @@
+info:
+  name: update-reservation
+  type: http
+  seq: 7
+
+http:
+  method: PATCH
+  url: "{{URL}}/{{tenantId}}/reservations/{{reservationId}}"
+  body:
+    type: json
+    data: |-
+      {
+        "startsAt": "2026-06-01T11:00:00.000Z",
+        "endsAt": "2026-06-01T12:00:00.000Z",
+        "roomBookings": [
+          {
+            "roomId": "{{publicRoomId}}",
+            "seatCount": 2
+          }
+        ]
+      }
+  auth:
+    type: bearer
+    token: "{{JWT}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

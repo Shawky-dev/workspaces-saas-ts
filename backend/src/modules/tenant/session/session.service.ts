@@ -95,20 +95,38 @@ export class SessionService extends TenantRepository<SessionDocument> {
         const customer = await this.resolveCustomer(tenantId, dto)
         const roomBookings = await this.resolveRoomBookings(tenantId, dto.roomBookings)
 
-        const session = await this.createDocument({
+        const session = await this.createSessionFromSnapshot(
+            tenantId,
+            customer,
+            roomBookings,
+        )
+
+        return this.toPublicSession(session)
+    }
+
+    async createSessionFromSnapshot(
+        tenantId: string,
+        customer: any,
+        roomBookings: any[],
+    ) {
+        await this.ensureRoomBookingsAvailableNow(tenantId, roomBookings)
+
+        return this.createDocument({
             status: SessionStatus.ACTIVE,
             customer,
             roomBookings,
             productLines: [],
             startedAt: new Date(),
         } as Partial<SessionDocument>, tenantId)
-
-        return this.toPublicSession(session)
     }
 
     async getActiveSessions(tenantId: string) {
         const sessions = await this.activeSessionQuery(tenantId)
         return sessions.map((session) => this.toPublicSession(session))
+    }
+
+    serializeSession(session: any) {
+        return this.toPublicSession(session)
     }
 
     async getSessionById(tenantId: string, id: string) {
@@ -298,6 +316,22 @@ export class SessionService extends TenantRepository<SessionDocument> {
         }
 
         return bookings
+    }
+
+    private async ensureRoomBookingsAvailableNow(
+        tenantId: string,
+        roomBookings: any[],
+    ) {
+        const availability = await this.getAvailability(tenantId)
+        const availabilityById = new Map(availability.map((room) => [room.id, room]))
+
+        for (const booking of roomBookings) {
+            const room = availabilityById.get(booking.roomId)
+
+            if (!room || booking.seatCount > room.availableSeats) {
+                throw new BadRequestException(`${booking.roomName} is currently occupied`)
+            }
+        }
     }
 
     private async resolveProductLines(

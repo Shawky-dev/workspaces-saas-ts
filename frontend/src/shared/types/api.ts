@@ -205,3 +205,78 @@ export interface CloseSessionPayload {
   paymentStatus: PaymentStatus
   paymentMethod: PaymentMethod
 }
+
+export type ReservationStatus = 'scheduled' | 'arrived' | 'canceled'
+
+export interface WeeklyReservationHours {
+  dayOfWeek: number
+  enabled: boolean
+  opensAt: string
+  closesAt: string
+}
+
+export interface ReservationSettings {
+  id?: string
+  timezone: string
+  slotMinutes: number
+  weeklyHours: WeeklyReservationHours[]
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface Reservation {
+  id: string
+  status: ReservationStatus
+  customer: SessionCustomerSnapshot
+  roomBookings: SessionRoomBooking[]
+  startsAt: string
+  endsAt: string
+  arrivedAt?: string
+  sessionId?: string
+  canceledAt?: string
+  cancelReason?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface ReservationTimetableSlot {
+  date: string
+  startsAt: string
+  endsAt: string
+  label: string
+  reservations: Reservation[]
+}
+
+export interface ReservationTimetable {
+  weekStart: string
+  weekEnd: string
+  settings: ReservationSettings
+  slots: ReservationTimetableSlot[]
+}
+
+export interface CreateReservationPayload {
+  customerId?: string
+  customer?: {
+    firstName: string
+    lastName: string
+    phoneNumber: string
+    email?: string
+  }
+  startsAt: string
+  endsAt: string
+  roomBookings: Array<{
+    roomId: string
+    seatCount?: number
+  }>
+}
+
+export type UpdateReservationPayload = Partial<CreateReservationPayload>
+
+export interface CancelReservationPayload {
+  reason?: string
+}
+
+export interface ConfirmArrivalResponse {
+  reservation: Reservation
+  session: Session
+}

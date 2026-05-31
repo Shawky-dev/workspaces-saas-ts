@@ -12,6 +12,7 @@ import RoomsView from '@/features/rooms/views/RoomsView.vue'
 import CustomersView from '@/features/customers/views/CustomersView.vue'
 import SessionsView from '@/features/sessions/views/SessionsView.vue'
 import ReceiptsView from '@/features/receipts/views/ReceiptsView.vue'
+import ReservationsView from '@/features/reservations/views/ReservationsView.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -68,6 +69,12 @@ export const router = createRouter({
           path: 'sessions',
           name: 'tenant-sessions',
           component: SessionsView,
+          meta: { authType: 'tenant' },
+        },
+        {
+          path: 'reservations',
+          name: 'tenant-reservations',
+          component: ReservationsView,
           meta: { authType: 'tenant' },
         },
         {
@@ -138,7 +145,7 @@ router.beforeEach((to) => {
   }
 
   if (
-    (to.name === 'tenant-users' || to.name === 'tenant-catalog' || to.name === 'tenant-inventory' || to.name === 'tenant-rooms' || to.name === 'tenant-customers' || to.name === 'tenant-sessions' || to.name === 'tenant-receipts')
+    (to.name === 'tenant-users' || to.name === 'tenant-catalog' || to.name === 'tenant-inventory' || to.name === 'tenant-rooms' || to.name === 'tenant-customers' || to.name === 'tenant-sessions' || to.name === 'tenant-receipts' || to.name === 'tenant-reservations')
     && session.value?.type === 'tenant'
   ) {
     const tenantSlug = Array.isArray(to.params.tenantSlug)

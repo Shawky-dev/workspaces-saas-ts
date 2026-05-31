@@ -397,7 +397,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section class="grid gap-6">
+  <section class="grid min-h-0 gap-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h1 class="text-2xl font-semibold tracking-tight">
@@ -441,14 +441,15 @@ onBeforeUnmount(() => {
           <Card
             v-for="currentSession in activeSessions"
             :key="currentSession.id"
+            class="min-w-0"
           >
             <CardHeader>
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <CardTitle class="text-base">
+                <div class="min-w-0">
+                  <CardTitle class="truncate text-base">
                     {{ customerName(currentSession.customer) }}
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription class="truncate">
                     {{ currentSession.customer.phoneNumber }}
                   </CardDescription>
                 </div>
@@ -465,7 +466,7 @@ onBeforeUnmount(() => {
                   :key="booking.roomId"
                   class="flex items-center justify-between gap-3"
                 >
-                  <span>{{ booking.roomName }}</span>
+                  <span class="min-w-0 truncate">{{ booking.roomName }}</span>
                   <Badge variant="secondary">
                     {{ booking.type === 'public' ? `${booking.seatCount} seats` : 'private' }}
                   </Badge>
@@ -489,8 +490,8 @@ onBeforeUnmount(() => {
                     :key="line.catalogItemId"
                     class="flex justify-between gap-3 text-xs"
                   >
-                    <span>{{ line.name }} x {{ line.quantity }}</span>
-                    <span>{{ formatMoney(line.unitPrice * line.quantity) }}</span>
+                    <span class="min-w-0 truncate">{{ line.name }} x {{ line.quantity }}</span>
+                    <span class="shrink-0">{{ formatMoney(line.unitPrice * line.quantity) }}</span>
                   </div>
                 </div>
                 <div class="flex justify-between">
@@ -539,7 +540,7 @@ onBeforeUnmount(() => {
               :key="room.id"
               class="flex items-center justify-between gap-3 rounded-md border p-3 text-sm"
             >
-              <span>{{ room.name }}</span>
+              <span class="min-w-0 truncate">{{ room.name }}</span>
               <Badge :variant="room.isAvailable ? 'default' : 'secondary'">
                 {{ room.isAvailable ? 'Available' : 'Occupied' }}
               </Badge>
@@ -563,7 +564,7 @@ onBeforeUnmount(() => {
               class="grid gap-1 rounded-md border p-3 text-sm"
             >
               <div class="flex items-center justify-between gap-3">
-                <span>{{ room.name }}</span>
+                <span class="min-w-0 truncate">{{ room.name }}</span>
                 <Badge :variant="room.availableSeats > 0 ? 'default' : 'secondary'">
                   {{ room.availableSeats }} / {{ room.totalSeats }}
                 </Badge>
@@ -578,7 +579,7 @@ onBeforeUnmount(() => {
     </div>
 
     <Dialog v-model:open="isStartOpen">
-      <DialogContent class="sm:max-w-3xl">
+      <DialogContent class="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Start Session</DialogTitle>
           <DialogDescription>
@@ -665,7 +666,7 @@ onBeforeUnmount(() => {
                 class="flex items-center justify-between gap-3 rounded-md border p-3 text-sm"
                 :class="room.isAvailable ? '' : 'opacity-50'"
               >
-                <span>{{ room.name }} - {{ formatMoney(room.ratePerHour) }}/hour</span>
+                <span class="min-w-0 truncate">{{ room.name }} - {{ formatMoney(room.ratePerHour) }}/hour</span>
                 <input
                   v-model="startForm.privateRooms[room.id]"
                   type="checkbox"
@@ -682,7 +683,7 @@ onBeforeUnmount(() => {
                 class="grid gap-2 rounded-md border p-3 text-sm"
               >
                 <div class="flex items-center justify-between gap-3">
-                  <span>{{ room.name }}</span>
+                  <span class="min-w-0 truncate">{{ room.name }}</span>
                   <Badge variant="secondary">
                     {{ room.availableSeats }} available
                   </Badge>
@@ -719,7 +720,7 @@ onBeforeUnmount(() => {
     </Dialog>
 
     <Dialog v-model:open="isSessionOpen">
-      <DialogContent class="sm:max-w-4xl">
+      <DialogContent class="max-h-[85vh] overflow-y-auto sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Session Products</DialogTitle>
           <DialogDescription>
@@ -742,7 +743,7 @@ onBeforeUnmount(() => {
           <AlertDescription>{{ productSuccessMessage }}</AlertDescription>
         </Alert>
 
-        <div class="overflow-hidden rounded-md border">
+        <div class="max-h-[360px] overflow-auto rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -759,7 +760,7 @@ onBeforeUnmount(() => {
                 v-for="item in catalogItems"
                 :key="item.id"
               >
-                <TableCell class="font-medium">
+                <TableCell class="max-w-[260px] truncate font-medium">
                   {{ item.name }}
                 </TableCell>
                 <TableCell>{{ item.quantityOnHand }}</TableCell>
@@ -816,8 +817,8 @@ onBeforeUnmount(() => {
             :key="line.item.id"
             class="flex items-center justify-between gap-3 text-sm"
           >
-            <span>{{ line.item.name }} x {{ line.quantity }}</span>
-            <span>{{ formatMoney(line.item.soldPrice * line.quantity) }}</span>
+            <span class="min-w-0 truncate">{{ line.item.name }} x {{ line.quantity }}</span>
+            <span class="shrink-0">{{ formatMoney(line.item.soldPrice * line.quantity) }}</span>
           </div>
         </div>
 
@@ -840,7 +841,7 @@ onBeforeUnmount(() => {
     </Dialog>
 
     <Dialog v-model:open="isProductConfirmOpen">
-      <DialogContent>
+      <DialogContent class="max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Products Added</DialogTitle>
           <DialogDescription>
@@ -854,8 +855,8 @@ onBeforeUnmount(() => {
             :key="line.catalogItemId"
             class="flex justify-between gap-3"
           >
-            <span>{{ line.name }} x {{ line.quantity }}</span>
-            <span>{{ formatMoney(line.unitPrice * line.quantity) }}</span>
+            <span class="min-w-0 truncate">{{ line.name }} x {{ line.quantity }}</span>
+            <span class="shrink-0">{{ formatMoney(line.unitPrice * line.quantity) }}</span>
           </div>
           <div
             v-if="!selectedSession?.productLines.length"
@@ -874,7 +875,7 @@ onBeforeUnmount(() => {
     </Dialog>
 
     <Dialog v-model:open="isCloseOpen">
-      <DialogContent class="sm:max-w-2xl">
+      <DialogContent class="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Close Session</DialogTitle>
           <DialogDescription>
@@ -922,8 +923,8 @@ onBeforeUnmount(() => {
                 :key="line.catalogItemId"
                 class="flex justify-between text-xs"
               >
-                <span>{{ line.name }} x {{ line.quantity }}</span>
-                <span>{{ formatMoney(line.unitPrice * line.quantity) }}</span>
+                <span class="min-w-0 truncate">{{ line.name }} x {{ line.quantity }}</span>
+                <span class="shrink-0">{{ formatMoney(line.unitPrice * line.quantity) }}</span>
               </div>
             </div>
           </div>

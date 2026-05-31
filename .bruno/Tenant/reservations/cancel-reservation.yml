@@ -1,0 +1,23 @@
+info:
+  name: cancel-reservation
+  type: http
+  seq: 8
+
+http:
+  method: POST
+  url: "{{URL}}/{{tenantId}}/reservations/{{reservationId}}/cancel"
+  body:
+    type: json
+    data: |-
+      {
+        "reason": "Customer requested cancellation"
+      }
+  auth:
+    type: bearer
+    token: "{{JWT}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -2,6 +2,7 @@
 import {
   Building2,
   Boxes,
+  CalendarClock,
   ClipboardList,
   LayoutDashboard,
   LogOut,
@@ -31,6 +32,11 @@ const navItems = computed(() => {
         label: 'Sessions',
         to: `/${session.value.tenantId}/sessions`,
         icon: ClipboardList,
+      },
+      {
+        label: 'Reservations',
+        to: `/${session.value.tenantId}/reservations`,
+        icon: CalendarClock,
       },
       {
         label: 'Catalog',
