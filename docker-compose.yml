@@ -13,17 +13,19 @@ services:
     build:  
       context: ./backend  
       dockerfile: Dockerfile.dev  
-    command: npm run build && npm run start:prod  
     ports:  
       - "${BACKEND_PORT}:3000"  
     env_file:  
       - .env  
     environment:  
-      NODE_ENV: production  
+      NODE_ENV: development  
       PORT: 3000  
     depends_on:  
       - mongodb  
     restart: unless-stopped  
+    volumes:  
+      - ./backend:/app  
+      - /app/node_modules  
   
   frontend:  
     container_name: frontend  
@@ -31,15 +33,17 @@ services:
       context: ./frontend  
       dockerfile: Dockerfile.dev  
     working_dir: /app  
-    command: npx vite build && npm run preview  
     ports:  
-      - "${FRONTEND_PORT}:4173"  
+      - "${FRONTEND_PORT}:5173"  
     environment:  
-      NODE_ENV: production  
+      NODE_ENV: development  
       VITE_API_URL: ${VITE_API_URL}  
     depends_on:  
       - backend  
-    restart: unless-stopped
+    restart: unless-stopped  
+    volumes:  
+      - ./frontend:/app  
+      - /app/node_modules  
   
 volumes:  
   mongodb_data:
