@@ -11,6 +11,10 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ['indomitable-gilbert-nongelatinous.ngrok-free.dev'],
+    allowedHosts: true,
+    hmr: {
+      clientPort: 443,
+      protocol: 'wss',
+    },
   },
 })
