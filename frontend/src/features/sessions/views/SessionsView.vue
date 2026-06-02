@@ -4,14 +4,12 @@ import { useRoute } from 'vue-router'
 import {
   AlertCircle,
   Clock3,
-  DoorOpen,
   Minus,
   Plus,
   ReceiptText,
   RotateCcw,
   Save,
   ShoppingCart,
-  Users,
 } from 'lucide-vue-next'
 import {
   Alert,
