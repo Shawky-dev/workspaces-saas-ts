@@ -9,6 +9,7 @@ import { MongoExceptionFilter } from './public/db/mongo-exception.filter'
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule)
   app.enableCors()
+  app.setGlobalPrefix('api')
   app.useGlobalFilters(new MongoExceptionFilter())
   setupValidation(app)
 
