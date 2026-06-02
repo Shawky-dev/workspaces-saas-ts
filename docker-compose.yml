@@ -26,20 +26,20 @@ services:
     restart: unless-stopped  
   
   frontend:  
-  container_name: frontend  
-  build:  
-    context: ./frontend  
-    dockerfile: Dockerfile.dev  
-  working_dir: /app  
-  command: npx vite build && npm run preview  
-  ports:  
-    - "${FRONTEND_PORT}:4173"  
-  environment:  
-    NODE_ENV: production  
-    VITE_API_URL: ${VITE_API_URL}  
-  depends_on:  
-    - backend  
-  restart: unless-stopped
+    container_name: frontend  
+    build:  
+      context: ./frontend  
+      dockerfile: Dockerfile.dev  
+    working_dir: /app  
+    command: npx vite build && npm run preview  
+    ports:  
+      - "${FRONTEND_PORT}:4173"  
+    environment:  
+      NODE_ENV: production  
+      VITE_API_URL: ${VITE_API_URL}  
+    depends_on:  
+      - backend  
+    restart: unless-stopped
   
 volumes:  
   mongodb_data:
