@@ -24,6 +24,7 @@ services:
 
     volumes:
       - ./backend:/app
+      - ./dummy_products:/app/dummy_products:ro
       - backend_node_modules:/app/node_modules
 
     env_file:
