@@ -15,6 +15,7 @@ import { RoomModule } from './modules/tenant/room/room.module'
 import { CustomerModule } from './modules/tenant/customer/customer.module'
 import { SessionModule } from './modules/tenant/session/session.module'
 import { ReservationModule } from './modules/tenant/reservation/reservation.module'
+import { DemoDataModule } from './modules/common/demo-data/demo-data.module'
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ReservationModule } from './modules/tenant/reservation/reservation.modu
     TenantsModule,
     CommonUserModule,
     TenantBootstrapModule,
+    DemoDataModule,
     //_TENANT
     TenantUserModule,
     CatalogModule,

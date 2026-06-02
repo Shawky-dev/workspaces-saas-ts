@@ -25,6 +25,7 @@ services:
     restart: unless-stopped  
     volumes:  
       - ./backend:/app  
+      - ./dummy_products:/app/dummy_products:ro
       - /app/node_modules  
   
   frontend:  

@@ -1,0 +1,21 @@
+info:
+  name: load-dummy-data
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{URL}}/demo/load"
+  body:
+    type: json
+    data: |-
+      {}
+  auth:
+    type: bearer
+    token: "{{JWT}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
