@@ -6,24 +6,27 @@ import {
   ClipboardList,
   LayoutDashboard,
   LogOut,
-  MoonStar,
   Package,
   ReceiptText,
-  SunMedium,
   Users,
 } from 'lucide-vue-next'
+
 import { computed } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { useTheme } from '@/composables/useTheme'
+
+
 import { useAuth } from '@/features/auth/composables/useAuth'
+
 import type { TenantUserRole } from '@/shared/types/api'
 
 const route = useRoute()
 const router = useRouter()
-const { isDark, toggleTheme } = useTheme()
+
+
 const { logout, session } = useAuth()
 
 interface NavItem {
@@ -39,33 +42,79 @@ const navItems = computed<NavItem[]>(() => {
     const tenantId = session.value.tenantId
 
     const allItems: NavItem[] = [
-      { label: 'Sessions', to: `/${tenantId}/sessions`, icon: ClipboardList,
-        allowedRoles: ['super_admin', 'receptionist'] },
-      { label: 'Reservations', to: `/${tenantId}/reservations`, icon: CalendarClock,
-        allowedRoles: ['super_admin', 'receptionist'] },
-      { label: 'Catalog', to: `/${tenantId}/catalog`, icon: Package,
-        allowedRoles: ['super_admin', 'supplier'] },
-      { label: 'Inventory', to: `/${tenantId}/inventory`, icon: Boxes,
-        allowedRoles: ['super_admin', 'supplier'] },
-      { label: 'Tenant Users', to: `/${tenantId}/users`, icon: Users,
-        allowedRoles: ['super_admin'] },
-      { label: 'Rooms', to: `/${tenantId}/rooms`, icon: Building2,
-        allowedRoles: ['super_admin', 'receptionist'] },
-      { label: 'Customers', to: `/${tenantId}/customers`, icon: Users,
-        allowedRoles: ['super_admin', 'receptionist'] },
-      { label: 'Receipts', to: `/${tenantId}/receipts`, icon: ReceiptText,
-        allowedRoles: ['super_admin', 'receptionist'] },
+      {
+        label: 'Sessions',
+        to: `/${tenantId}/sessions`,
+        icon: ClipboardList,
+        allowedRoles: ['super_admin', 'receptionist'],
+      },
+      {
+        label: 'Reservations',
+        to: `/${tenantId}/reservations`,
+        icon: CalendarClock,
+        allowedRoles: ['super_admin', 'receptionist'],
+      },
+      {
+        label: 'Catalog',
+        to: `/${tenantId}/catalog`,
+        icon: Package,
+        allowedRoles: ['super_admin', 'supplier'],
+      },
+      {
+        label: 'Inventory',
+        to: `/${tenantId}/inventory`,
+        icon: Boxes,
+        allowedRoles: ['super_admin', 'supplier'],
+      },
+      {
+        label: 'Tenant Users',
+        to: `/${tenantId}/users`,
+        icon: Users,
+        allowedRoles: ['super_admin'],
+      },
+      {
+        label: 'Rooms',
+        to: `/${tenantId}/rooms`,
+        icon: Building2,
+        allowedRoles: ['super_admin', 'receptionist'],
+      },
+      {
+        label: 'Customers',
+        to: `/${tenantId}/customers`,
+        icon: Users,
+        allowedRoles: ['super_admin', 'receptionist'],
+      },
+      {
+        label: 'Receipts',
+        to: `/${tenantId}/receipts`,
+        icon: ReceiptText,
+        allowedRoles: ['super_admin', 'receptionist'],
+      },
     ]
 
     return role
-      ? allItems.filter(item => !item.allowedRoles || item.allowedRoles.includes(role))
+      ? allItems.filter(
+          item => !item.allowedRoles || item.allowedRoles.includes(role),
+        )
       : allItems
   }
 
   return [
-    { label: 'Dashboard', to: '/common', icon: LayoutDashboard },
-    { label: 'Tenants', to: '/common/tenants', icon: Building2 },
-    { label: 'Common Users', to: '/common/common-users', icon: Users },
+    {
+      label: 'Dashboard',
+      to: '/common',
+      icon: LayoutDashboard,
+    },
+    {
+      label: 'Tenants',
+      to: '/common/tenants',
+      icon: Building2,
+    },
+    {
+      label: 'Common Users',
+      to: '/common/common-users',
+      icon: Users,
+    },
   ]
 })
 
@@ -75,80 +124,118 @@ function handleLogout() {
 }
 </script>
 
+```vue
 <template>
-  <div class="min-h-screen bg-background text-foreground">
-    <div class="grid min-h-screen lg:grid-cols-[260px_1fr]">
-      <aside class="border-b bg-sidebar text-sidebar-foreground lg:border-b-0 lg:border-r">
+  <div class="min-h-screen bg-[#050816] text-white">
+    <div class="grid min-h-screen lg:grid-cols-[280px_1fr]">
+
+      <!-- SIDEBAR -->
+      <aside
+        class="
+          border-r border-white/10
+          bg-[#050816]/95
+          backdrop-blur-2xl
+          text-white
+        "
+      >
         <div class="flex h-full flex-col">
-          <div class="flex h-16 items-center justify-between px-4">
+
+          <!-- HEADER -->
+          <div class="flex h-20 items-center px-6">
             <div>
-              <p class="text-sm font-semibold">
+              <p class="text-lg font-bold tracking-wide text-white">
                 Workspaces
               </p>
-              <p class="text-xs text-muted-foreground">
+
+              <p class="text-xs text-gray-400">
                 Admin panel
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-              @click="toggleTheme"
-            >
-              <SunMedium
-                v-if="isDark"
-                class="h-4 w-4"
-              />
-              <MoonStar
-                v-else
-                class="h-4 w-4"
-              />
-            </Button>
           </div>
 
-          <Separator />
+          <Separator class="bg-white/10" />
 
-          <nav class="grid gap-1 p-3">
-            <Button
+          <!-- NAVIGATION -->
+          <nav class="grid gap-2 p-4">
+            <RouterLink
               v-for="item in navItems"
               :key="item.to"
-              as-child
-              :variant="route.path === item.to ? 'secondary' : 'ghost'"
-              class="justify-start"
+              :to="item.to"
+              class="
+                flex items-center gap-3
+                rounded-xl
+                border
+                px-4 py-3
+                transition-all duration-200
+              "
+              :class="
+                route.path === item.to
+                  ? 'border-pink-500/40 bg-pink-500/20 text-pink-300 shadow-lg shadow-pink-500/10'
+                  : 'border-transparent text-gray-300 hover:border-pink-500/20 hover:bg-white/5 hover:text-white'
+              "
             >
-              <RouterLink :to="item.to">
-                <component
-                  :is="item.icon"
-                  class="h-4 w-4"
-                />
-                {{ item.label }}
-              </RouterLink>
-            </Button>
+              <component
+                :is="item.icon"
+                class="h-4 w-4"
+              />
+
+              {{ item.label }}
+            </RouterLink>
           </nav>
 
-          <div class="mt-auto grid gap-3 p-4">
-            <div class="grid gap-1 rounded-md border bg-background p-3">
+          <!-- USER -->
+          <div class="mt-auto grid gap-4 p-4">
+            <div
+              class="
+                rounded-2xl
+                border border-white/10
+                bg-white/5
+                p-4
+                backdrop-blur-xl
+                shadow-2xl
+              "
+            >
               <div class="flex items-center justify-between gap-2">
-                <p class="truncate text-sm font-medium">
+                <p class="truncate text-sm font-semibold text-white">
                   {{ session?.user.name }}
                 </p>
-                <Badge variant="secondary">
+
+                <Badge
+                  class="
+                    border-0
+                    bg-gradient-to-r
+                    from-pink-500
+                    to-fuchsia-600
+                    text-white
+                  "
+                >
                   {{ session?.user.role ?? session?.type }}
                 </Badge>
               </div>
-              <p class="truncate text-xs text-muted-foreground">
+
+              <p class="mt-2 truncate text-xs text-gray-400">
                 {{ session?.user.email }}
               </p>
+
               <p
                 v-if="session?.tenantId"
-                class="truncate text-xs text-muted-foreground"
+                class="mt-1 truncate text-xs text-gray-500"
               >
                 Tenant: {{ session.tenantId }}
               </p>
             </div>
+
+            <!-- LOGOUT -->
             <Button
-              variant="outline"
-              class="justify-start"
+              variant="ghost"
+              class="
+                justify-start
+                border border-white/10
+                bg-white/5
+                text-white
+                hover:bg-red-500/10
+                hover:text-red-300
+              "
               @click="handleLogout"
             >
               <LogOut class="h-4 w-4" />
@@ -158,11 +245,45 @@ function handleLogout() {
         </div>
       </aside>
 
-      <main class="min-w-0">
-        <div class="mx-auto grid w-full max-w-6xl gap-6 p-4 md:p-6">
-          <RouterView />
+      <!-- MAIN -->
+      <main class="relative min-w-0 overflow-hidden bg-[#050816]">
+
+        <!-- BACKGROUND IMAGE -->
+        <img
+          src="/src/assets/bg.png"
+          alt=""
+          class="
+            absolute
+            inset-0
+            h-full
+            w-full
+            object-cover
+            opacity-40
+            pointer-events-none
+            select-none
+          "
+        />
+
+        <!-- OVERLAY -->
+        <div
+          class="
+            absolute inset-0
+            bg-gradient-to-br
+            from-[#050816]/72
+            via-[#081020]/58
+            to-[#050816]/78
+          "
+        />
+
+        <!-- CONTENT -->
+        <div class="relative z-10">
+          <div class="mx-auto grid w-full max-w-7xl gap-6 p-6">
+            <RouterView />
+          </div>
         </div>
+
       </main>
     </div>
   </div>
 </template>
+```
