@@ -239,7 +239,7 @@ export function listRooms(
   tenantId: string,
   token?: string | null,
 ) {
-  return apiRequest(`/${tenantId}/rooms`, {
+  return apiRequest<any[]>(`/${tenantId}/rooms`, {
     token,
   })
 }
