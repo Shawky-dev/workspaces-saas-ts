@@ -1,73 +1,47 @@
-services:
-  mongodb:
-    image: mongo:7
-    container_name: mongodb
-    restart: unless-stopped
-
-    ports:
-      - "27017:27017"
-
-    volumes:
-      - mongodb_data:/data/db
-
-  backend:
-    container_name: backend
-
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.dev
-
-    command: npm run start:dev
-
-    ports:
-      - "${BACKEND_PORT}:3000"
-
-    volumes:
-      - ./backend:/app
-      - backend_node_modules:/app/node_modules
-
-    env_file:
-      - .env
-
-    environment:
-      NODE_ENV: development
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      PORT: 3000
-
-    depends_on:
-      - mongodb
-
-    restart: unless-stopped
-
-  frontend:
-    container_name: frontend
-
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
-
-    working_dir: /app
-
-    command: npm run dev -- --host
-
-    ports:
-      - "${FRONTEND_PORT}:5173"
-
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-
-    environment:
-      NODE_ENV: development
-      CHOKIDAR_USEPOLLING: "true"
-      VITE_API_URL: ${VITE_API_URL}
-
-    depends_on:
-      - backend
-
-    restart: unless-stopped
-
-volumes:
+services:  
+  mongodb:  
+    image: mongo:7  
+    container_name: mongodb  
+    restart: unless-stopped  
+    ports:  
+      - "27017:27017"  
+    volumes:  
+      - mongodb_data:/data/db  
+  
+  backend:  
+    container_name: backend  
+    build:  
+      context: ./backend  
+      dockerfile: Dockerfile.dev  
+    command: npm run start:prod  # Changed from start:dev  
+    ports:  
+      - "${BACKEND_PORT}:3000"  
+    # Removed volume mounts  
+    env_file:  
+      - .env  
+    environment:  
+      NODE_ENV: production  # Changed from development  
+      PORT: 3000  
+    depends_on:  
+      - mongodb  
+    restart: unless-stopped  
+  
+  frontend:  
+    container_name: frontend  
+    build:  
+      context: ./frontend  
+      dockerfile: Dockerfile.dev  
+    working_dir: /app  
+    command: npm run build && npm run preview  # Changed from dev  
+    ports:  
+      - "${FRONTEND_PORT}:4173"  # Preview uses port 4173  
+    # Removed volume mounts  
+    environment:  
+      NODE_ENV: production  
+      VITE_API_URL: ${VITE_API_URL}  
+    depends_on:  
+      - backend  
+    restart: unless-stopped  
+  
+volumes:  
   mongodb_data:
-  backend_node_modules:
