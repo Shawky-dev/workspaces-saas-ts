@@ -1,0 +1,47 @@
+session_name: workspace-saas
+start_directory: .
+
+windows:
+  - window_name: docker
+    layout: even-vertical
+    panes:
+      - shell_command:
+          - docker compose up --build
+
+  - window_name: backend
+    layout: main-horizontal
+    panes:
+      # Logs
+      - shell_command:
+          - docker logs -f backend
+
+      # Exec shell
+      - shell_command:
+          - docker exec -it backend sh
+
+  - window_name: frontend
+    layout: main-horizontal
+    panes:
+      # Logs
+      - shell_command:
+          - docker logs -f frontend
+
+      # Exec shell
+      - shell_command:
+          - docker exec -it frontend sh
+
+  - window_name: mongodb
+    layout: main-horizontal
+    panes:
+      # Logs
+      - shell_command:
+          - docker logs -f mongodb
+
+      # Mongo shell
+      - shell_command:
+          - docker exec -it mongodb mongosh
+  - window_name: ngrok
+    layout: even-vertical
+    panes:
+      - shell_command:
+          - ngrok http 5173
