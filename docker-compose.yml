@@ -37,13 +37,25 @@ services:
       - "${FRONTEND_PORT}:5173"  
     environment:  
       NODE_ENV: development  
-      VITE_API_URL: ${VITE_API_URL}  
+      VITE_API_URL: /api  # Changed to relative path  
     depends_on:  
       - backend  
     restart: unless-stopped  
     volumes:  
       - ./frontend:/app  
       - /app/node_modules  
+  
+  nginx:  
+    image: nginx:alpine  
+    container_name: nginx  
+    ports:  
+      - "80:80"  
+    volumes:  
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf  
+    depends_on:  
+      - frontend  
+      - backend  
+    restart: unless-stopped  
   
 volumes:  
   mongodb_data:
