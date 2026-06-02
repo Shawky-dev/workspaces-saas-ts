@@ -31,7 +31,7 @@ services:
       context: ./frontend  
       dockerfile: Dockerfile.dev  
     working_dir: /app  
-    command: npm run build -- --skip-ts-check && npm run preview  
+    command: npm run build && npm run preview  # Remove --skip-ts-check, we'll fix differently  
     ports:  
       - "${FRONTEND_PORT}:4173"  
     environment:  
@@ -39,7 +39,7 @@ services:
       VITE_API_URL: ${VITE_API_URL}  
     depends_on:  
       - backend  
-    restart: unless-stopped  
+    restart: unless-stopped
   
 volumes:  
   mongodb_data:
