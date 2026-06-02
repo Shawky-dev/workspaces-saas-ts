@@ -9,37 +9,37 @@ services:
       - mongodb_data:/data/db  
   
   backend:  
-  container_name: backend  
-  build:  
-    context: ./backend  
-    dockerfile: Dockerfile.dev  
-  command: npm run build && npm run start:prod  # Added build step  
-  ports:  
-    - "${BACKEND_PORT}:3000"  
-  env_file:  
-    - .env  
-  environment:  
-    NODE_ENV: production  
-    PORT: 3000  
-  depends_on:  
-    - mongodb  
-  restart: unless-stopped  
+    container_name: backend  
+    build:  
+      context: ./backend  
+      dockerfile: Dockerfile.dev  
+    command: npm run build && npm run start:prod  
+    ports:  
+      - "${BACKEND_PORT}:3000"  
+    env_file:  
+      - .env  
+    environment:  
+      NODE_ENV: production  
+      PORT: 3000  
+    depends_on:  
+      - mongodb  
+    restart: unless-stopped  
   
-frontend:  
-  container_name: frontend  
-  build:  
-    context: ./frontend  
-    dockerfile: Dockerfile.dev  
-  working_dir: /app  
-  command: npm run build -- --skip-ts-check && npm run preview  # Skip TypeScript checks  
-  ports:  
-    - "${FRONTEND_PORT}:4173"  
-  environment:  
-    NODE_ENV: production  
-    VITE_API_URL: ${VITE_API_URL}  
-  depends_on:  
-    - backend  
-  restart: unless-stopped
+  frontend:  
+    container_name: frontend  
+    build:  
+      context: ./frontend  
+      dockerfile: Dockerfile.dev  
+    working_dir: /app  
+    command: npm run build -- --skip-ts-check && npm run preview  
+    ports:  
+      - "${FRONTEND_PORT}:4173"  
+    environment:  
+      NODE_ENV: production  
+      VITE_API_URL: ${VITE_API_URL}  
+    depends_on:  
+      - backend  
+    restart: unless-stopped  
   
 volumes:  
   mongodb_data:
